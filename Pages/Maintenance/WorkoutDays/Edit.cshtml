@@ -1,0 +1,141 @@
+﻿@page "{id:int}"
+@model GymTracker.Pages.Maintenance.WorkoutDays.EditModel
+
+<h2 class="mb-4">
+    Configurar @Model.Day!.DayOfWeek
+</h2>
+
+<hr />
+
+<!-- ================= MUSCULOS ================= -->
+<h4>Músculos</h4>
+
+<div class="mb-3">
+    @foreach (var m in Model.Day.Muscles)
+    {
+        <form method="post" asp-page-handler="RemoveMuscle"
+              asp-route-id="@Model.Day.Id"
+              asp-route-muscleId="@m.MuscleId"
+              class="d-inline">
+            <span class="badge bg-secondary me-1">
+                @m.Muscle.Name
+                <button class="btn btn-sm btn-light ms-1">x</button>
+            </span>
+        </form>
+    }
+</div>
+
+<form method="post" asp-page-handler="AddMuscle" asp-route-id="@Model.Day.Id" class="row g-2">
+    <div class="col-md-4">
+        <select asp-for="MuscleId" class="form-select">
+            <option value="">-- Agregar músculo --</option>
+            @foreach (var m in Model.AllMuscles)
+            {
+                <option value="@m.Id">@m.Name</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-primary">Agregar</button>
+    </div>
+</form>
+
+<hr />
+
+<!-- ================= EJERCICIOS ================= -->
+<h4>Ejercicios de fuerza</h4>
+
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th>Ejercicio</th>
+            <th>Series</th>
+            <th>Reps</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var e in Model.Day.Exercises)
+        {
+            <tr>
+                <td>@e.Exercise.Name</td>
+                <td>@e.PlannedSets</td>
+                <td>@e.PlannedReps</td>
+                <td class="text-end">
+                    <form method="post" asp-page-handler="RemoveExercise"
+                          asp-route-id="@Model.Day.Id"
+                          asp-route-exId="@e.Id">
+                        <button class="btn btn-sm btn-outline-danger">Quitar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<form method="post" asp-page-handler="AddExercise" asp-route-id="@Model.Day.Id" class="row g-2">
+    <div class="col-md-4">
+        <select asp-for="ExerciseId" class="form-select">
+            <option value="">-- Ejercicio --</option>
+            @foreach (var e in Model.StrengthExercises)
+            {
+                <option value="@e.Id">@e.Name</option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <input asp-for="PlannedSets" class="form-control" placeholder="Series" />
+    </div>
+
+    <div class="col-md-2">
+        <input asp-for="PlannedReps" class="form-control" placeholder="Reps" />
+    </div>
+
+    <div class="col-md-2">
+        <button class="btn btn-success">Agregar</button>
+    </div>
+</form>
+
+<hr />
+<h4>Cardio (Final del día)</h4>
+
+@if (Model.Day.Exercises.Any(e => e.Exercise.Type == Enums.ExerciseType.Cardio))
+{
+    <ul class="list-group mb-3">Enums.
+        @foreach (var c in Model.Day.Exercises.Where(e => e.Exercise.Type == Enums.ExerciseType.Cardio))
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                @c.Exercise.Name
+                <form method="post" asp-page-handler="RemoveCardio"
+                      asp-route-id="@Model.Day.Id"
+                      asp-route-exId="@c.Id">
+                    <button class="btn btn-sm btn-outline-danger">Quitar</button>
+                </form>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p class="text-muted">No hay cardio asignado para este día.</p>
+}
+
+<form method="post" asp-page-handler="AddCardio" asp-route-id="@Model.Day.Id" class="row g-2">
+    <div class="col-md-4">
+        <select asp-for="CardioExerciseId" class="form-select">
+            <option value="">-- Seleccionar cardio --</option>
+            @foreach (var c in Model.CardioExercises)
+            {
+                <option value="@c.Id">@c.Name</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-success">Agregar Cardio</button>
+    </div>
+</form>
+
+<a asp-page="Index" class="btn btn-outline-secondary">
+    ← Volver
+</a>

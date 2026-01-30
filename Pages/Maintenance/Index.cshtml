@@ -1,0 +1,42 @@
+﻿@page
+@model GymTracker.Pages.Maintenance.IndexModel
+
+<h2 class="mb-4">Mantenimiento</h2>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <a asp-page="/Maintenance/Muscles/Index" class="card text-decoration-none shadow-sm">
+            <div class="card-body">
+                <h5>🧠 Músculos</h5>
+                <p class="text-muted">Catálogo de músculos</p>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-4">
+        <a asp-page="/Maintenance/Exercises/Index" class="card text-decoration-none shadow-sm">
+            <div class="card-body">
+                <h5>🏋️ Ejercicios</h5>
+                <p class="text-muted">Ejercicios por músculo</p>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-4">
+        <a asp-page="/Maintenance/WorkoutDays/Index" class="card text-decoration-none shadow-sm">
+            <div class="card-body">
+                <h5>📆 Días de entrenamiento</h5>
+                <p class="text-muted">Rutina semanal</p>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-4">
+        <a asp-page="/Maintenance/Cardio/Index" class="card text-decoration-none shadow-sm">
+            <div class="card-body">
+                <h5>❤️ Cardio</h5>
+                <p class="text-muted">Tipos de cardio</p>
+            </div>
+        </a>
+    </div>
+</div>

@@ -1,0 +1,91 @@
+﻿@page
+@model IndexModel
+
+@{
+    ViewData["Title"] = "Entrenamiento de Hoy";
+}
+
+<div class="container mt-4">
+
+    <!-- HEADER -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body text-center">
+            <h2 class="fw-bold mb-1">@Model.DayName</h2>
+            <p class="text-muted mb-0">
+                @Model.Today.ToString("dddd, dd MMMM yyyy")
+            </p>
+        </div>
+    </div>
+
+    <!-- MUSCULOS -->
+    <div class="mb-4">
+        <h5 class="fw-semibold mb-2">Músculos a trabajar</h5>
+        <div class="d-flex flex-wrap gap-2">
+            @foreach (var muscle in Model.Muscles)
+            {
+                <span class="badge rounded-pill bg-secondary-subtle text-dark px-3 py-2">
+                    @muscle
+                </span>
+            }
+        </div>
+    </div>
+
+    <!-- EJERCICIOS -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="fw-semibold mb-3">Ejercicios</h5>
+
+            @foreach (var group in Model.Exercises.GroupBy(e => e.Muscle))
+            {
+                <div class="mb-4">
+                    <h6 class="text-uppercase fw-bold text-secondary mb-2">
+                        @group.Key
+                    </h6>
+
+                    <ul class="list-group list-group-flush">
+                        @foreach (var ex in group)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>@ex.Name</span>
+                                <span class="text-muted small">
+                                    @ex.Sets x @ex.Reps
+                                </span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- CARDIO -->
+    @if (Model.Cardio.Any())
+    {
+        <div class="card shadow-sm mb-4 border-start border-4 border-primary">
+            <div class="card-body">
+                <h5 class="fw-semibold mb-3">Cardio</h5>
+
+                <ul class="list-group list-group-flush">
+                    @foreach (var cardio in Model.Cardio)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>@cardio.Name</span>
+                            <span class="text-muted small">
+                                @cardio.Minutes min
+                            </span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+
+    <!-- BOTON -->
+    <div class="d-grid">
+        <a asp-page="/Workout/Start"
+           class="btn btn-primary btn-lg">
+            Comenzar entrenamiento
+        </a>
+    </div>
+
+</div>
