@@ -8,7 +8,6 @@
     <thead class="table-dark">
         <tr>
             <th style="width:140px">Día</th>
-            <th>Músculos</th>
             <th>Ejercicios</th>
             <th class="text-end" style="width:160px">Acciones</th>
         </tr>
@@ -20,41 +19,48 @@
                 <td class="fw-bold">@day.DayOfWeek</td>
 
                 <td>
-                    @if (day.Muscles.Any())
+                    @* Fuerza *@
+                    @if (day.MuscleGroups.Any())
                     {
-                        @foreach (var m in day.Muscles)
+                        foreach (var mg in day.MuscleGroups)
                         {
-                            <span class="badge bg-secondary me-1">
-                                @m.Muscle.Name
-                            </span>
+                            <div class="mb-1">
+                                <strong>@mg.MuscleName</strong>
+                                <ul class="mb-1">
+                                    @foreach (var e in mg.Exercises)
+                                    {
+                                        <li>
+                                            @e.Name
+                                            <span class="text-muted">
+                                                (@e.Sets x @e.Reps)
+                                            </span>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
                         }
                     }
-                    else
-                    {
-                        <span class="text-muted">—</span>
-                    }
-                </td>
 
-                <td>
-                    @if (day.Exercises.Any())
+                    @* Cardio *@
+                    @if (day.CardioExercises.Any())
                     {
-                        <ul class="mb-0">
-                            @foreach (var e in day.Exercises)
-                            {
-                                <li>
-                                    @e.Exercise.Name
-                                    <span class="text-muted">
-                                        (@e.PlannedSets x @e.PlannedReps)
-                                    </span>
-                                </li>
-                            }
-                        </ul>
+                        <div class="mt-2">
+                            <strong>Cardio</strong>
+                            <ul class="mb-0">
+                                @foreach (var c in day.CardioExercises)
+                                {
+                                    <li>@c.Name</li>
+                                }
+                            </ul>
+                        </div>
                     }
-                    else
+
+                    @if (!day.MuscleGroups.Any() && !day.CardioExercises.Any())
                     {
                         <span class="text-muted">Sin ejercicios</span>
                     }
                 </td>
+
 
                 <td class="text-end">
                     <a asp-page="Edit"

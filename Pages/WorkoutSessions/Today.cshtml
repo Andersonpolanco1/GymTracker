@@ -1,0 +1,201 @@
+﻿@page
+@model GymTracker.Pages.WorkoutSessions.TodayModel
+
+<h2>Entrenamiento del día (@Model.Session?.Date.ToShortDateString())</h2>
+<hr />
+<br />
+
+<!-- TABS -->
+<ul class="nav nav-tabs" id="workoutTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active"
+                id="strength-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#strength"
+                type="button"
+                role="tab">
+            💪 Fuerza
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link"
+                id="cardio-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#cardio"
+                type="button"
+                role="tab">
+            ❤️ Cardio
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content mt-3" id="workoutTabsContent">
+
+    <!-- ================= FUERZA ================= -->
+    <div class="tab-pane fade show active" id="strength" role="tabpanel">
+
+        <form method="post" asp-page-handler="AddStrength" class="row g-2 mb-3">
+            <div class="col-md-3">
+                <select asp-for="SelectedStrengthId" class="form-select">
+                    <option value="">-- Selecciona ejercicio --</option>
+
+                    @if (Model.StrengthRoutineExercises.Any())
+                    {
+                        <optgroup label="🔥 Rutina de hoy">
+                            @foreach (var e in Model.StrengthRoutineExercises)
+                            {
+                                <option value="@e.Id">@e.Name</option>
+                            }
+                        </optgroup>
+                    }
+
+                    @if (Model.StrengthOtherExercises.Any())
+                    {
+                        <optgroup label="➕ Otros ejercicios">
+                            @foreach (var e in Model.StrengthOtherExercises)
+                            {
+                                <option value="@e.Id">@e.Name</option>
+                            }
+                        </optgroup>
+                    }
+                </select>
+
+            </div>
+
+            <div class="col-md-2">
+                <input asp-for="Reps" class="form-control" placeholder="Reps" />
+            </div>
+
+            <div class="col-md-2">
+                <input asp-for="Weight" class="form-control" placeholder="Peso (LB)" />
+            </div>
+
+            <div class="col-md-3">
+                <button class="btn btn-primary">Agregar serie</button>
+            </div>
+        </form>
+
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Ejercicio</th>
+                    <th># Serie</th>
+                    <th>Reps</th>
+                    <th>Peso (LB)</th>
+                    <th>Volumen</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var s in Model.Sets)
+                {
+                    <tr>
+                        <td>@s.Exercise.Name</td>
+                        <td>@s.SetNumber</td>
+                        <td>@s.Reps</td>
+                        <td>@s.Weight</td>
+                        <td>@s.Volume</td>
+                        <td>
+                            <form method="post"
+                                  asp-page-handler="RemoveStrength"
+                                  asp-route-id="@s.Id">
+                                <button class="btn btn-sm btn-outline-danger">
+                                    Quitar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+
+    <!-- ================= CARDIO ================= -->
+    <div class="tab-pane fade" id="cardio" role="tabpanel">
+
+        <form method="post" asp-page-handler="AddCardio" class="row g-2 mb-3">
+            <div class="col-md-3">
+                <select asp-for="SelectedCardioId" class="form-select">
+                    <option value="">-- Selecciona cardio --</option>
+
+                    @if (Model.CardioRoutineExercises.Any())
+                    {
+                        <optgroup label="🔥 Cardio programado">
+                            @foreach (var e in Model.CardioRoutineExercises)
+                            {
+                                <option value="@e.Id">@e.Name</option>
+                            }
+                        </optgroup>
+                    }
+
+                    @if (Model.CardioOtherExercises.Any())
+                    {
+                        <optgroup label="➕ Otros cardio">
+                            @foreach (var e in Model.CardioOtherExercises)
+                            {
+                                <option value="@e.Id">@e.Name</option>
+                            }
+                        </optgroup>
+                    }
+                </select>
+
+            </div>
+
+            <div class="col-md-2">
+                <input asp-for="DurationMinutes" class="form-control" placeholder="Minutos" />
+            </div>
+
+            <div class="col-md-2">
+                <input asp-for="DistanceKm" class="form-control" placeholder="Km" />
+            </div>
+
+            <div class="col-md-2">
+                <input asp-for="Calories" class="form-control" placeholder="Calorías" />
+            </div>
+
+            <div class="col-md-2">
+                <input asp-for="AvgHeartRate" class="form-control" placeholder="FC media" />
+            </div>
+
+            <div class="col-md-1">
+                <button class="btn btn-primary">Agregar</button>
+            </div>
+        </form>
+
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Ejercicio</th>
+                    <th>Duración</th>
+                    <th>Distancia</th>
+                    <th>Calorías</th>
+                    <th>FC media</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model.CardioSessions)
+                {
+                    <tr>
+                        <td>@c.Exercise.Name</td>
+                        <td>@c.DurationMinutes</td>
+                        <td>@c.DistanceKm</td>
+                        <td>@c.Calories</td>
+                        <td>@c.AvgHeartRate</td>
+                        <td>
+                            <form method="post"
+                                  asp-page-handler="RemoveCardio"
+                                  asp-route-id="@c.Id">
+                                <button class="btn btn-sm btn-outline-danger">
+                                    Quitar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+</div>

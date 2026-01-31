@@ -1,7 +1,6 @@
 using GymTracker.Enums;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
 
 namespace GymTracker.Pages
 {
@@ -22,16 +21,12 @@ namespace GymTracker.Pages
       Today = DateTime.Today;
 
       // Nombre del día en español
-      DayName = CultureInfo
-          .GetCultureInfo("es-ES")
-          .DateTimeFormat
-          .GetDayName(Today.DayOfWeek)
-          .ToUpperInvariant();
+      DayName = Utils.Utilities.GetDayNameInSpanishCapitalized(Today.DayOfWeek);
 
       // Buscar el WorkoutDay según el día actual
       var workoutDay = await context.WorkoutDays
-          .Include(w => w.Muscles)
-              .ThenInclude(m => m.Muscle)
+          //.Include(w => w.Muscles)
+          //    .ThenInclude(m => m.Muscle)
           .Include(w => w.Exercises)
               .ThenInclude(e => e.Exercise)
                   .ThenInclude(ex => ex.Muscle)
@@ -41,10 +36,13 @@ namespace GymTracker.Pages
         return;
 
       // Músculos del día
-      Muscles = workoutDay.Muscles
-          .Select(m => m.Muscle.Name)
+      Muscles = workoutDay.Exercises
+          .Where(e => e.Exercise.Muscle != null)
+          .Select(e => e.Exercise.Muscle!.Name)
           .Distinct()
+          .OrderBy(m => m)
           .ToList();
+
 
       // Ejercicios de fuerza
       Exercises = workoutDay.Exercises

@@ -6,7 +6,6 @@
     public DayOfWeek DayOfWeek { get; set; }
 
     // Navegación
-    public ICollection<WorkoutDayMuscle> Muscles { get; set; } = [];
     public ICollection<WorkoutDayExercise> Exercises { get; set; } = [];
   }
 

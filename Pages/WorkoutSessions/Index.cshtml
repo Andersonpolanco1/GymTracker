@@ -1,0 +1,59 @@
+﻿@page
+@model GymTracker.Pages.WorkoutSessions.IndexModel
+
+@{
+    ViewData["Title"] = "Sesiones de Entrenamiento";
+}
+
+<div class="container mt-4">
+
+    <h2 class="fw-bold mb-4">📆 Historial de Entrenamientos</h2>
+
+    @if (!Model.Sessions.Any())
+    {
+        <div class="alert alert-info">
+            No hay sesiones registradas todavía.
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Día</th>
+                            <th class="text-center">Series</th>
+                            <th class="text-center">Volumen (lb)</th>
+                            <th class="text-center">Cardio (min)</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var s in Model.Sessions)
+                        {
+                            <tr>
+                                <td>@Utils.Utilities.GetLocalDateFormat(s.Date)</td>
+                                <td>@s.DayName</td>
+
+                                <td class="text-center">@s.StrengthSets</td>
+                                <td class="text-center">@s.TotalVolume</td>
+                                <td class="text-center">@s.CardioMinutes</td>
+
+                                <td class="text-end">
+                                    <a asp-page="/WorkoutSessions/Details"
+                                       asp-route-id="@s.Id"
+                                       class="btn btn-sm btn-outline-primary">
+                                        Ver detalle →
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+</div>

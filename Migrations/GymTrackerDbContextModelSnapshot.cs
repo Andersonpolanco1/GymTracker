@@ -77,7 +77,7 @@ namespace GymTracker.Migrations
                         {
                             Id = 1,
                             MuscleId = 1,
-                            Name = "Peso muerto",
+                            Name = "Peso muerto (espalda baja)",
                             Type = 1
                         },
                         new
@@ -98,7 +98,21 @@ namespace GymTracker.Migrations
                         {
                             Id = 4,
                             MuscleId = 1,
-                            Name = "Jalon al pecho agarre neutro",
+                            Name = "Jalón al pecho agarre neutro",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 5,
+                            MuscleId = 1,
+                            Name = "Remo en polea baja",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 6,
+                            MuscleId = 1,
+                            Name = "Remo pecho apoyado en máquina",
                             Type = 1
                         },
                         new
@@ -119,6 +133,20 @@ namespace GymTracker.Migrations
                         {
                             Id = 12,
                             MuscleId = 2,
+                            Name = "Curl en polea baja",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 13,
+                            MuscleId = 2,
+                            Name = "Predicador",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 14,
+                            MuscleId = 2,
                             Name = "Curl martillo",
                             Type = 1
                         },
@@ -133,14 +161,49 @@ namespace GymTracker.Migrations
                         {
                             Id = 21,
                             MuscleId = 3,
-                            Name = "Hack squat",
+                            Name = "Zancadas caminando",
                             Type = 1
                         },
                         new
                         {
                             Id = 22,
                             MuscleId = 3,
+                            Name = "Extensiones de piernas",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 23,
+                            MuscleId = 3,
+                            Name = "Elevaciones de talones de pie",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 24,
+                            MuscleId = 3,
+                            Name = "Hack squat",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 25,
+                            MuscleId = 3,
+                            Name = "Curl femoral sentado",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 26,
+                            MuscleId = 3,
                             Name = "Curl femoral acostado",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 27,
+                            MuscleId = 3,
+                            Name = "Gemelos en prensa",
                             Type = 1
                         },
                         new
@@ -154,21 +217,70 @@ namespace GymTracker.Migrations
                         {
                             Id = 31,
                             MuscleId = 4,
-                            Name = "Elevaciones laterales",
+                            Name = "Face pull",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 32,
+                            MuscleId = 4,
+                            Name = "Arnold press",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 33,
+                            MuscleId = 4,
+                            Name = "Elevaciones laterales en polea",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 34,
+                            MuscleId = 4,
+                            Name = "Elevaciones posteriores en máquina",
                             Type = 1
                         },
                         new
                         {
                             Id = 40,
                             MuscleId = 5,
-                            Name = "Press plano con barra",
+                            Name = "Press inclinado con mancuernas",
                             Type = 1
                         },
                         new
                         {
                             Id = 41,
                             MuscleId = 5,
-                            Name = "Press inclinado con mancuernas",
+                            Name = "Press plano con barra",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 42,
+                            MuscleId = 5,
+                            Name = "Fondos en paralelas (pecho)",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 43,
+                            MuscleId = 5,
+                            Name = "Press inclinado en máquina",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 44,
+                            MuscleId = 5,
+                            Name = "Aperturas con mancuernas",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 45,
+                            MuscleId = 5,
+                            Name = "Cruce unilateral en polea",
                             Type = 1
                         },
                         new
@@ -182,21 +294,63 @@ namespace GymTracker.Migrations
                         {
                             Id = 51,
                             MuscleId = 6,
+                            Name = "Extensión por encima de la cabeza en polea con barra",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 52,
+                            MuscleId = 6,
                             Name = "Extensión en polea con cuerda",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 53,
+                            MuscleId = 6,
+                            Name = "Rompecráneos",
                             Type = 1
                         },
                         new
                         {
                             Id = 60,
                             MuscleId = 7,
-                            Name = "Plancha",
+                            Name = "Elevaciones de piernas colgado",
                             Type = 1
                         },
                         new
                         {
                             Id = 61,
                             MuscleId = 7,
+                            Name = "Plancha",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 62,
+                            MuscleId = 7,
                             Name = "Ab wheel",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 63,
+                            MuscleId = 7,
+                            Name = "Crunch declinado",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 64,
+                            MuscleId = 7,
+                            Name = "Russian twist",
+                            Type = 1
+                        },
+                        new
+                        {
+                            Id = 65,
+                            MuscleId = 7,
+                            Name = "Plancha lateral",
                             Type = 1
                         },
                         new
@@ -208,7 +362,7 @@ namespace GymTracker.Migrations
                         new
                         {
                             Id = 101,
-                            Name = "Escalera mecanica",
+                            Name = "Escalera Mecanica",
                             Type = 2
                         });
                 });
@@ -401,14 +555,6 @@ namespace GymTracker.Migrations
                         new
                         {
                             Id = 4,
-                            ExerciseId = 4,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 1
-                        },
-                        new
-                        {
-                            Id = 5,
                             ExerciseId = 10,
                             PlannedReps = 12,
                             PlannedSets = 3,
@@ -416,7 +562,7 @@ namespace GymTracker.Migrations
                         },
                         new
                         {
-                            Id = 6,
+                            Id = 5,
                             ExerciseId = 11,
                             PlannedReps = 10,
                             PlannedSets = 3,
@@ -424,15 +570,15 @@ namespace GymTracker.Migrations
                         },
                         new
                         {
-                            Id = 7,
-                            ExerciseId = 12,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
+                            Id = 6,
+                            ExerciseId = 101,
+                            PlannedReps = 15,
+                            PlannedSets = 1,
                             WorkoutDayId = 1
                         },
                         new
                         {
-                            Id = 8,
+                            Id = 7,
                             ExerciseId = 20,
                             PlannedReps = 12,
                             PlannedSets = 3,
@@ -440,17 +586,25 @@ namespace GymTracker.Migrations
                         },
                         new
                         {
-                            Id = 9,
+                            Id = 8,
                             ExerciseId = 21,
-                            PlannedReps = 10,
+                            PlannedReps = 12,
+                            PlannedSets = 3,
+                            WorkoutDayId = 2
+                        },
+                        new
+                        {
+                            Id = 9,
+                            ExerciseId = 22,
+                            PlannedReps = 12,
                             PlannedSets = 3,
                             WorkoutDayId = 2
                         },
                         new
                         {
                             Id = 10,
-                            ExerciseId = 22,
-                            PlannedReps = 12,
+                            ExerciseId = 23,
+                            PlannedReps = 15,
                             PlannedSets = 3,
                             WorkoutDayId = 2
                         },
@@ -466,22 +620,22 @@ namespace GymTracker.Migrations
                         {
                             Id = 12,
                             ExerciseId = 31,
-                            PlannedReps = 15,
+                            PlannedReps = 12,
                             PlannedSets = 3,
                             WorkoutDayId = 2
                         },
                         new
                         {
                             Id = 13,
-                            ExerciseId = 40,
-                            PlannedReps = 10,
-                            PlannedSets = 3,
-                            WorkoutDayId = 3
+                            ExerciseId = 100,
+                            PlannedReps = 15,
+                            PlannedSets = 1,
+                            WorkoutDayId = 2
                         },
                         new
                         {
                             Id = 14,
-                            ExerciseId = 41,
+                            ExerciseId = 40,
                             PlannedReps = 12,
                             PlannedSets = 3,
                             WorkoutDayId = 3
@@ -489,7 +643,7 @@ namespace GymTracker.Migrations
                         new
                         {
                             Id = 15,
-                            ExerciseId = 50,
+                            ExerciseId = 41,
                             PlannedReps = 10,
                             PlannedSets = 3,
                             WorkoutDayId = 3
@@ -497,7 +651,7 @@ namespace GymTracker.Migrations
                         new
                         {
                             Id = 16,
-                            ExerciseId = 51,
+                            ExerciseId = 42,
                             PlannedReps = 12,
                             PlannedSets = 3,
                             WorkoutDayId = 3
@@ -505,14 +659,46 @@ namespace GymTracker.Migrations
                         new
                         {
                             Id = 17,
-                            ExerciseId = 3,
+                            ExerciseId = 50,
                             PlannedReps = 12,
                             PlannedSets = 3,
-                            WorkoutDayId = 4
+                            WorkoutDayId = 3
                         },
                         new
                         {
                             Id = 18,
+                            ExerciseId = 51,
+                            PlannedReps = 12,
+                            PlannedSets = 3,
+                            WorkoutDayId = 3
+                        },
+                        new
+                        {
+                            Id = 19,
+                            ExerciseId = 60,
+                            PlannedReps = 15,
+                            PlannedSets = 3,
+                            WorkoutDayId = 3
+                        },
+                        new
+                        {
+                            Id = 20,
+                            ExerciseId = 61,
+                            PlannedReps = 60,
+                            PlannedSets = 3,
+                            WorkoutDayId = 3
+                        },
+                        new
+                        {
+                            Id = 21,
+                            ExerciseId = 62,
+                            PlannedReps = 12,
+                            PlannedSets = 3,
+                            WorkoutDayId = 3
+                        },
+                        new
+                        {
+                            Id = 22,
                             ExerciseId = 4,
                             PlannedReps = 12,
                             PlannedSets = 3,
@@ -520,15 +706,23 @@ namespace GymTracker.Migrations
                         },
                         new
                         {
-                            Id = 19,
-                            ExerciseId = 10,
+                            Id = 23,
+                            ExerciseId = 5,
                             PlannedReps = 12,
                             PlannedSets = 3,
                             WorkoutDayId = 4
                         },
                         new
                         {
-                            Id = 20,
+                            Id = 24,
+                            ExerciseId = 6,
+                            PlannedReps = 12,
+                            PlannedSets = 3,
+                            WorkoutDayId = 4
+                        },
+                        new
+                        {
+                            Id = 25,
                             ExerciseId = 12,
                             PlannedReps = 12,
                             PlannedSets = 3,
@@ -536,144 +730,155 @@ namespace GymTracker.Migrations
                         },
                         new
                         {
-                            Id = 21,
-                            ExerciseId = 20,
+                            Id = 26,
+                            ExerciseId = 13,
+                            PlannedReps = 12,
+                            PlannedSets = 3,
+                            WorkoutDayId = 4
+                        },
+                        new
+                        {
+                            Id = 27,
+                            ExerciseId = 14,
+                            PlannedReps = 12,
+                            PlannedSets = 3,
+                            WorkoutDayId = 4
+                        },
+                        new
+                        {
+                            Id = 28,
+                            ExerciseId = 101,
+                            PlannedReps = 15,
+                            PlannedSets = 1,
+                            WorkoutDayId = 4
+                        },
+                        new
+                        {
+                            Id = 29,
+                            ExerciseId = 24,
                             PlannedReps = 12,
                             PlannedSets = 3,
                             WorkoutDayId = 5
                         },
                         new
                         {
-                            Id = 22,
-                            ExerciseId = 21,
-                            PlannedReps = 10,
-                            PlannedSets = 3,
-                            WorkoutDayId = 5
-                        },
-                        new
-                        {
-                            Id = 23,
-                            ExerciseId = 22,
+                            Id = 30,
+                            ExerciseId = 25,
                             PlannedReps = 12,
                             PlannedSets = 3,
                             WorkoutDayId = 5
                         },
                         new
                         {
-                            Id = 24,
-                            ExerciseId = 31,
+                            Id = 31,
+                            ExerciseId = 26,
+                            PlannedReps = 12,
+                            PlannedSets = 3,
+                            WorkoutDayId = 5
+                        },
+                        new
+                        {
+                            Id = 32,
+                            ExerciseId = 27,
                             PlannedReps = 15,
                             PlannedSets = 3,
                             WorkoutDayId = 5
                         },
                         new
                         {
-                            Id = 25,
-                            ExerciseId = 40,
+                            Id = 33,
+                            ExerciseId = 32,
                             PlannedReps = 10,
                             PlannedSets = 3,
-                            WorkoutDayId = 6
+                            WorkoutDayId = 5
                         },
                         new
                         {
-                            Id = 26,
-                            ExerciseId = 41,
+                            Id = 34,
+                            ExerciseId = 33,
+                            PlannedReps = 12,
+                            PlannedSets = 3,
+                            WorkoutDayId = 5
+                        },
+                        new
+                        {
+                            Id = 35,
+                            ExerciseId = 34,
+                            PlannedReps = 12,
+                            PlannedSets = 3,
+                            WorkoutDayId = 5
+                        },
+                        new
+                        {
+                            Id = 36,
+                            ExerciseId = 100,
+                            PlannedReps = 15,
+                            PlannedSets = 1,
+                            WorkoutDayId = 5
+                        },
+                        new
+                        {
+                            Id = 37,
+                            ExerciseId = 43,
                             PlannedReps = 12,
                             PlannedSets = 3,
                             WorkoutDayId = 6
                         },
                         new
                         {
-                            Id = 27,
-                            ExerciseId = 50,
-                            PlannedReps = 10,
-                            PlannedSets = 3,
-                            WorkoutDayId = 6
-                        },
-                        new
-                        {
-                            Id = 28,
-                            ExerciseId = 51,
+                            Id = 38,
+                            ExerciseId = 44,
                             PlannedReps = 12,
                             PlannedSets = 3,
                             WorkoutDayId = 6
-                        });
-                });
-
-            modelBuilder.Entity("GymTracker.Models.WorkoutDayMuscle", b =>
-                {
-                    b.Property<int>("WorkoutDayId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("MuscleId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("WorkoutDayId", "MuscleId");
-
-                    b.HasIndex("MuscleId");
-
-                    b.ToTable("WorkoutDayMuscle");
-
-                    b.HasData(
-                        new
-                        {
-                            WorkoutDayId = 1,
-                            MuscleId = 1
                         },
                         new
                         {
-                            WorkoutDayId = 1,
-                            MuscleId = 2
+                            Id = 39,
+                            ExerciseId = 45,
+                            PlannedReps = 12,
+                            PlannedSets = 3,
+                            WorkoutDayId = 6
                         },
                         new
                         {
-                            WorkoutDayId = 2,
-                            MuscleId = 3
+                            Id = 40,
+                            ExerciseId = 52,
+                            PlannedReps = 12,
+                            PlannedSets = 3,
+                            WorkoutDayId = 6
                         },
                         new
                         {
-                            WorkoutDayId = 2,
-                            MuscleId = 4
+                            Id = 41,
+                            ExerciseId = 53,
+                            PlannedReps = 12,
+                            PlannedSets = 3,
+                            WorkoutDayId = 6
                         },
                         new
                         {
-                            WorkoutDayId = 3,
-                            MuscleId = 5
+                            Id = 42,
+                            ExerciseId = 63,
+                            PlannedReps = 12,
+                            PlannedSets = 3,
+                            WorkoutDayId = 6
                         },
                         new
                         {
-                            WorkoutDayId = 3,
-                            MuscleId = 6
+                            Id = 43,
+                            ExerciseId = 64,
+                            PlannedReps = 12,
+                            PlannedSets = 3,
+                            WorkoutDayId = 6
                         },
                         new
                         {
-                            WorkoutDayId = 4,
-                            MuscleId = 1
-                        },
-                        new
-                        {
-                            WorkoutDayId = 4,
-                            MuscleId = 2
-                        },
-                        new
-                        {
-                            WorkoutDayId = 5,
-                            MuscleId = 3
-                        },
-                        new
-                        {
-                            WorkoutDayId = 5,
-                            MuscleId = 4
-                        },
-                        new
-                        {
-                            WorkoutDayId = 6,
-                            MuscleId = 5
-                        },
-                        new
-                        {
-                            WorkoutDayId = 6,
-                            MuscleId = 6
+                            Id = 44,
+                            ExerciseId = 65,
+                            PlannedReps = 60,
+                            PlannedSets = 3,
+                            WorkoutDayId = 6
                         });
                 });
 
@@ -762,25 +967,6 @@ namespace GymTracker.Migrations
                     b.Navigation("WorkoutDay");
                 });
 
-            modelBuilder.Entity("GymTracker.Models.WorkoutDayMuscle", b =>
-                {
-                    b.HasOne("GymTracker.Models.Muscle", "Muscle")
-                        .WithMany()
-                        .HasForeignKey("MuscleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GymTracker.Models.WorkoutDay", "WorkoutDay")
-                        .WithMany("Muscles")
-                        .HasForeignKey("WorkoutDayId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Muscle");
-
-                    b.Navigation("WorkoutDay");
-                });
-
             modelBuilder.Entity("GymTracker.Models.WorkoutSession", b =>
                 {
                     b.HasOne("GymTracker.Models.WorkoutDay", "WorkoutDay")
@@ -800,8 +986,6 @@ namespace GymTracker.Migrations
             modelBuilder.Entity("GymTracker.Models.WorkoutDay", b =>
                 {
                     b.Navigation("Exercises");
-
-                    b.Navigation("Muscles");
                 });
 
             modelBuilder.Entity("GymTracker.Models.WorkoutSession", b =>

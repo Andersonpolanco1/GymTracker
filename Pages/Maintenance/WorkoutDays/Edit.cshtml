@@ -1,46 +1,34 @@
 ﻿@page "{id:int}"
 @model GymTracker.Pages.Maintenance.WorkoutDays.EditModel
 
-<h2 class="mb-4">
-    Configurar @Model.Day!.DayOfWeek
+<h2 class="">
+    Configurar @Utils.Utilities.GetDayNameInSpanishCapitalized(Model.Day!.DayOfWeek)
 </h2>
 
-<hr />
-
+<br />
 <!-- ================= MUSCULOS ================= -->
-<h4>Músculos</h4>
-
-<div class="mb-3">
-    @foreach (var m in Model.Day.Muscles)
-    {
-        <form method="post" asp-page-handler="RemoveMuscle"
-              asp-route-id="@Model.Day.Id"
-              asp-route-muscleId="@m.MuscleId"
-              class="d-inline">
-            <span class="badge bg-secondary me-1">
-                @m.Muscle.Name
-                <button class="btn btn-sm btn-light ms-1">x</button>
-            </span>
-        </form>
-    }
-</div>
-
-<form method="post" asp-page-handler="AddMuscle" asp-route-id="@Model.Day.Id" class="row g-2">
-    <div class="col-md-4">
-        <select asp-for="MuscleId" class="form-select">
-            <option value="">-- Agregar músculo --</option>
-            @foreach (var m in Model.AllMuscles)
-            {
-                <option value="@m.Id">@m.Name</option>
-            }
-        </select>
-    </div>
-    <div class="col-md-2">
-        <button class="btn btn-primary">Agregar</button>
-    </div>
-</form>
-
+<h4>Músculos trabajados</h4>
 <hr />
+
+@if (Model.Muscles.Any())
+{
+    <div class="mb-3">
+        @foreach (var m in Model.Muscles)
+        {
+            <span class="badge bg-secondary me-1">
+                @m
+            </span>
+        }
+    </div>
+}
+else
+{
+    <p class="text-muted">No hay músculos definidos para este día.</p>
+}
+
+
+
+<br />
 
 <!-- ================= EJERCICIOS ================= -->
 <h4>Ejercicios de fuerza</h4>
@@ -93,7 +81,7 @@
     </div>
 
     <div class="col-md-2">
-        <button class="btn btn-success">Agregar</button>
+        <button class="btn btn-primary">Agregar</button>
     </div>
 </form>
 
@@ -102,7 +90,7 @@
 
 @if (Model.Day.Exercises.Any(e => e.Exercise.Type == Enums.ExerciseType.Cardio))
 {
-    <ul class="list-group mb-3">Enums.
+    <ul class="list-group mb-3">
         @foreach (var c in Model.Day.Exercises.Where(e => e.Exercise.Type == Enums.ExerciseType.Cardio))
         {
             <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -132,10 +120,10 @@ else
         </select>
     </div>
     <div class="col-md-2">
-        <button class="btn btn-success">Agregar Cardio</button>
+        <button class="btn btn-primary">Agregar Cardio</button>
     </div>
 </form>
-
+<br />
 <a asp-page="Index" class="btn btn-outline-secondary">
     ← Volver
 </a>

@@ -6,7 +6,7 @@
     public string Name { get; set; } = null!;
 
     // Navegación
-    public ICollection<Exercise> Exercises { get; set; } = new List<Exercise>();
+    public ICollection<Exercise> Exercises { get; set; } = [];
   }
 
 }

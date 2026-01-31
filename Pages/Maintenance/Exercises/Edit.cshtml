@@ -1,0 +1,82 @@
+﻿@page "{id:int}"
+@model GymTracker.Pages.Maintenance.Exercises.EditModel
+
+@{
+    ViewData["Title"] = "Editar ejercicio";
+}
+
+<h2 class="mb-4">✏️ Editar ejercicio</h2>
+
+<form method="post" class="card shadow-sm p-4">
+
+    <input type="hidden" asp-for="Exercise.Id" />
+
+    <!-- NOMBRE -->
+    <div class="mb-3">
+        <label asp-for="Exercise.Name" class="form-label fw-semibold"></label>
+        <input asp-for="Exercise.Name" class="form-control" />
+        <span asp-validation-for="Exercise.Name" class="text-danger"></span>
+    </div>
+
+    <!-- TIPO -->
+    <div class="mb-3">
+        <label asp-for="Exercise.Type" class="form-label fw-semibold"></label>
+        <select asp-for="Exercise.Type"
+                asp-items="Model.ExerciseTypes"
+                class="form-select"
+                id="exerciseType">
+        </select>
+    </div>
+
+    <!-- MUSCULO -->
+    <div class="mb-4">
+        <label class="form-label fw-semibold">Músculo</label>
+
+        <select asp-for="Exercise.MuscleId"
+                asp-items="Model.Muscles"
+                class="form-select"
+                id="muscleSelect">
+            <option value="">— Sin músculo (Cardio) —</option>
+        </select>
+
+        <div class="form-text text-muted">
+            Solo aplica para ejercicios de fuerza.
+        </div>
+    </div>
+
+
+    <!-- ACCIONES -->
+    <div class="d-flex justify-content-end gap-2">
+        <a asp-page="Index" class="btn btn-outline-secondary">
+            Cancelar
+        </a>
+
+        <button type="submit" class="btn btn-warning">
+            Guardar cambios
+        </button>
+    </div>
+
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const typeSelect = document.getElementById('exerciseType');
+        const muscleSelect = document.getElementById('muscleSelect');
+
+        function toggleMuscleSelect() {
+            const isCardio = typeSelect.value === 'Cardio';
+
+            muscleSelect.disabled = isCardio;
+
+            if (isCardio) {
+                muscleSelect.value = '';
+            }
+        }
+
+        toggleMuscleSelect();
+
+        typeSelect.addEventListener('change', toggleMuscleSelect);
+    </script>
+}
