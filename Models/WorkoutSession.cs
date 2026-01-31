@@ -9,6 +9,7 @@
     public WorkoutDay WorkoutDay { get; set; } = null!;
 
     public ICollection<ExerciseSet> Sets { get; set; } = [];
+    public ICollection<CardioSession> CardioSessions { get; set; } = [];
   }
 
 }

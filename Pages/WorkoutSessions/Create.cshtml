@@ -1,8 +1,25 @@
 ﻿@page
-@model GymTracker.Pages.WorkoutSessions.TodayModel
+@model GymTracker.Pages.WorkoutSessions.CreateModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
-<h2>Entrenamiento del día (@Model.Session?.Date.ToShortDateString())</h2>
+<h2>Entrenamiento del día (@Model.SelectedDate?.ToShortDateString())</h2>
+
 <hr />
+<br />
+
+<!-- Selector de fecha -->
+<div class="mb-3">
+    <label for="sessionDate" class="form-label">Selecciona la fecha de la sesión:</label>
+    <input type="date" id="sessionDate" class="form-control"
+           asp-for="SelectedDate"
+           onchange="onDateChange()" />
+    <span class="text-danger">@Model.DateErrorMessage</span>
+</div>
+
+<!-- Mensajes generales del modelo -->
+<div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+<h3>Registrar Series</h3>
 <br />
 
 <!-- TABS -->
@@ -33,12 +50,13 @@
 
     <!-- ================= FUERZA ================= -->
     <div class="tab-pane fade show active" id="strength" role="tabpanel">
-
         <form method="post" asp-page-handler="AddStrength" class="row g-2 mb-3">
+            <input type="hidden" asp-for="ActiveTab" value="strength" />
+
+            <!-- Selección de ejercicio -->
             <div class="col-md-3">
                 <select asp-for="SelectedStrengthId" class="form-select">
                     <option value="">-- Selecciona ejercicio --</option>
-
                     @if (Model.StrengthRoutineExercises.Any())
                     {
                         <optgroup label="🔥 Rutina de hoy">
@@ -48,7 +66,6 @@
                             }
                         </optgroup>
                     }
-
                     @if (Model.StrengthOtherExercises.Any())
                     {
                         <optgroup label="➕ Otros ejercicios">
@@ -59,22 +76,34 @@
                         </optgroup>
                     }
                 </select>
-
+                <span class="text-danger" asp-validation-for="SelectedStrengthId"></span>
             </div>
 
+            <!-- Repeticiones -->
             <div class="col-md-2">
-                <input asp-for="Reps" class="form-control" placeholder="Reps" />
+                <select asp-for="Reps" class="form-select">
+                    <option value="">-- Reps --</option>
+                    @for (int i = 1; i <= 30; i++)
+                    {
+                        <option value="@i">@i</option>
+                    }
+                </select>
+                <span class="text-danger" asp-validation-for="Reps"></span>
             </div>
 
+            <!-- Peso -->
             <div class="col-md-2">
                 <input asp-for="Weight" class="form-control" placeholder="Peso (LB)" />
+                <span class="text-danger" asp-validation-for="Weight"></span>
             </div>
 
+            <!-- Botón agregar -->
             <div class="col-md-3">
                 <button class="btn btn-primary">Agregar serie</button>
             </div>
         </form>
 
+        <!-- Tabla de series -->
         <table class="table table-sm">
             <thead>
                 <tr>
@@ -99,26 +128,24 @@
                             <form method="post"
                                   asp-page-handler="RemoveStrength"
                                   asp-route-id="@s.Id">
-                                <button class="btn btn-sm btn-outline-danger">
-                                    Quitar
-                                </button>
+                                <button class="btn btn-sm btn-outline-danger">Quitar</button>
                             </form>
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
-
     </div>
 
     <!-- ================= CARDIO ================= -->
     <div class="tab-pane fade" id="cardio" role="tabpanel">
-
         <form method="post" asp-page-handler="AddCardio" class="row g-2 mb-3">
+            <input type="hidden" asp-for="ActiveTab" value="cardio" />
+
+            <!-- Selección de ejercicio cardio -->
             <div class="col-md-3">
                 <select asp-for="SelectedCardioId" class="form-select">
                     <option value="">-- Selecciona cardio --</option>
-
                     @if (Model.CardioRoutineExercises.Any())
                     {
                         <optgroup label="🔥 Cardio programado">
@@ -128,7 +155,6 @@
                             }
                         </optgroup>
                     }
-
                     @if (Model.CardioOtherExercises.Any())
                     {
                         <optgroup label="➕ Otros cardio">
@@ -139,30 +165,40 @@
                         </optgroup>
                     }
                 </select>
-
+                <span class="text-danger" asp-validation-for="SelectedCardioId"></span>
             </div>
 
+            <!-- Duración -->
             <div class="col-md-2">
                 <input asp-for="DurationMinutes" class="form-control" placeholder="Minutos" />
+                <span class="text-danger" asp-validation-for="DurationMinutes"></span>
             </div>
 
+            <!-- Distancia -->
             <div class="col-md-2">
                 <input asp-for="DistanceKm" class="form-control" placeholder="Km" />
+                <span class="text-danger" asp-validation-for="DistanceKm"></span>
             </div>
 
+            <!-- Calorías -->
             <div class="col-md-2">
                 <input asp-for="Calories" class="form-control" placeholder="Calorías" />
+                <span class="text-danger" asp-validation-for="Calories"></span>
             </div>
 
+            <!-- FC media -->
             <div class="col-md-2">
                 <input asp-for="AvgHeartRate" class="form-control" placeholder="FC media" />
+                <span class="text-danger" asp-validation-for="AvgHeartRate"></span>
             </div>
 
+            <!-- Botón agregar -->
             <div class="col-md-1">
                 <button class="btn btn-primary">Agregar</button>
             </div>
         </form>
 
+        <!-- Tabla de cardio -->
         <table class="table table-sm">
             <thead>
                 <tr>
@@ -187,15 +223,32 @@
                             <form method="post"
                                   asp-page-handler="RemoveCardio"
                                   asp-route-id="@c.Id">
-                                <button class="btn btn-sm btn-outline-danger">
-                                    Quitar
-                                </button>
+                                <button class="btn btn-sm btn-outline-danger">Quitar</button>
                             </form>
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
-
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        function onDateChange() {
+            var date = document.getElementById('sessionDate').value;
+            if(date) window.location.href = '?date=' + date;
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            var activeTab = "@Model.ActiveTab";
+            if (activeTab) {
+                var triggerEl = document.querySelector(`#${activeTab}-tab`);
+                var tab = new bootstrap.Tab(triggerEl);
+                tab.show();
+            }
+        });
+    </script>
+}
