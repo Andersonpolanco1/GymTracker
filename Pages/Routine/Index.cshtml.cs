@@ -38,6 +38,7 @@ public class IndexModel(GymTrackerDbContext context) : PageModel
                 Name = e.Exercise.Name,
                 Sets = e.PlannedSets,
                 Reps = e.PlannedReps,
+                DurationSeconds = e.PlannedDurationSeconds,
                 Type = e.Exercise.Type
               }).ToList()
             })
@@ -48,7 +49,8 @@ public class IndexModel(GymTrackerDbContext context) : PageModel
             .Select(e => new RoutineExerciseVm
             {
               Name = e.Exercise.Name,
-              Type = ExerciseType.Cardio
+              Type = ExerciseType.Cardio,
+              DurationSeconds = e.PlannedDurationSeconds
             })
             .ToList()
     }).ToList();

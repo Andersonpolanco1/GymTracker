@@ -42,13 +42,24 @@ namespace GymTracker.Pages.WorkoutSessions
 
     // Fecha seleccionada
     [BindProperty] public DateTime? SelectedDate { get; set; }
+    public List<int> WorkoutDays { get; set; } = []; 
+
 
     // ================= GET =================
     public async Task<IActionResult> OnGetAsync(DateTime? date)
     {
       SelectedDate = date ?? Utils.Utilities.NowRD();
       await LoadExercisesAsync(SelectedDate.Value);
+      await LoadActiveWorkoutDays();
       return Page();
+    }
+
+    private async Task LoadActiveWorkoutDays()
+    {
+      WorkoutDays = await context.WorkoutDays
+      .Where(d => d.IsActive && d.UserId == UserId)
+      .Select(d => (int)d.DayOfWeek)
+      .ToListAsync();
     }
 
     // ================= CARGA GENERAL =================
@@ -57,6 +68,7 @@ namespace GymTracker.Pages.WorkoutSessions
       var dayOfWeek = date.DayOfWeek;
 
       var workoutDay = await context.WorkoutDays
+        .Where(d => d.IsActive)
           .Include(d => d.Exercises)
               .ThenInclude(de => de.Exercise)
           .FirstOrDefaultAsync(d => d.DayOfWeek == dayOfWeek);
@@ -116,7 +128,7 @@ namespace GymTracker.Pages.WorkoutSessions
       if (!ModelState.IsValid)
         return await OnGetAsync(SelectedDate);
 
-      var session = await GetOrCreateSessionAsync(SelectedDate ?? DateTime.Today);
+      var session = await GetOrCreateSessionAsync(SelectedDate ?? Utils.Utilities.TodayRD());
 
       int lastSetNumber = await context.ExerciseSets
           .Where(s => s.WorkoutSessionId == session.Id && s.ExerciseId == SelectedStrengthId)
@@ -195,7 +207,8 @@ namespace GymTracker.Pages.WorkoutSessions
     private async Task<WorkoutSession> GetOrCreateSessionAsync(DateTime date)
     {
       var workoutDay = await context.WorkoutDays
-          .FirstAsync(d => d.DayOfWeek == date.DayOfWeek);
+          .FirstOrDefaultAsync(d => d.DayOfWeek == date.DayOfWeek && d.IsActive) ?? throw new InvalidOperationException(
+            $"El día {date:dddd, dd/MM/yyyy} no esta agregado a los dias de ejercicios activos.");
 
       var session = await context.WorkoutSessions
           .FirstOrDefaultAsync(s =>

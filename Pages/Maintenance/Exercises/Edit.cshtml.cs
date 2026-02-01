@@ -30,7 +30,7 @@ public class EditModel(GymTrackerDbContext context) : PageModel
     return Page();
   }
 
-  public async Task<IActionResult> OnPostAsync()
+  public async Task<IActionResult> OnPostAddAsync()
   {
     if (Exercise is not null)
     {
@@ -49,6 +49,7 @@ public class EditModel(GymTrackerDbContext context) : PageModel
       }
     }
 
+
     if (!ModelState.IsValid)
     {
       LoadSelectLists();
@@ -65,6 +66,29 @@ public class EditModel(GymTrackerDbContext context) : PageModel
 
     return RedirectToPage("Index");
   }
+
+  public async Task<IActionResult> OnPostDeleteAsync(int id)
+  {
+    var exercise = await _context.Exercises.FindAsync(id);
+    if (exercise == null)
+      return NotFound();
+
+    bool isUsed = await _context.Set<WorkoutDayExercise>()
+        .AnyAsync(w => w.ExerciseId == id);
+
+    if (isUsed)
+    {
+      TempData["ErrorMessage"] = "No se puede eliminar este ejercicio porque ya está asignado a rutinas.";
+      return RedirectToPage(new { id });
+    }
+
+    _context.Exercises.Remove(exercise);
+    await _context.SaveChangesAsync();
+
+    TempData["SuccessMessage"] = "Ejercicio eliminado correctamente.";
+    return RedirectToPage("Index");
+  }
+
 
   private void LoadSelectLists()
   {

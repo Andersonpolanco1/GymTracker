@@ -11,7 +11,8 @@
     public Exercise Exercise { get; set; } = null!;
 
     public int PlannedSets { get; set; }
-    public int PlannedReps { get; set; }
+    public int? PlannedReps { get; set; }
+    public int? PlannedDurationSeconds { get; set; }
   }
 
 }

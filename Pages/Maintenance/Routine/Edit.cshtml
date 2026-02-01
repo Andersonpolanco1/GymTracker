@@ -1,17 +1,23 @@
 ﻿@page "{id:int}"
-@model GymTracker.Pages.Maintenance.WorkoutDays.EditModel
+@model GymTracker.Pages.Maintenance.Routine.EditModel
 
-<h2 class="">
+@{
+    ViewData["Title"] = "Editar Rutina";
+}
+
+
+<h2>
     Configurar @Utils.Utilities.GetDayNameInSpanishCapitalized(Model.Day!.DayOfWeek)
 </h2>
 
 <br />
+
 <!-- ================= MUSCULOS ================= -->
-<h4>Músculos trabajados</h4>
-<hr />
 
 @if (Model.Muscles.Any())
 {
+    <h4>Áreas a trabajar</h4>
+    <hr />
     <div class="mb-3">
         @foreach (var m in Model.Muscles)
         {
@@ -21,47 +27,13 @@
         }
     </div>
 }
-else
-{
-    <p class="text-muted">No hay músculos definidos para este día.</p>
-}
-
-
 
 <br />
 
-<!-- ================= EJERCICIOS ================= -->
+<!-- ================= EJERCICIOS DE FUERZA ================= -->
 <h4>Ejercicios de fuerza</h4>
 
-<table class="table table-sm">
-    <thead>
-        <tr>
-            <th>Ejercicio</th>
-            <th>Series</th>
-            <th>Reps</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var e in Model.Day.Exercises)
-        {
-            <tr>
-                <td>@e.Exercise.Name</td>
-                <td>@e.PlannedSets</td>
-                <td>@e.PlannedReps</td>
-                <td class="text-end">
-                    <form method="post" asp-page-handler="RemoveExercise"
-                          asp-route-id="@Model.Day.Id"
-                          asp-route-exId="@e.Id">
-                        <button class="btn btn-sm btn-outline-danger">Quitar</button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-<form method="post" asp-page-handler="AddExercise" asp-route-id="@Model.Day.Id" class="row g-2">
+<form method="post" asp-page-handler="AddExercise" asp-route-id="@Model.Day.Id" class="row g-2 mb-3">
     <div class="col-md-4">
         <select asp-for="ExerciseId" class="form-select">
             <option value="">-- Ejercicio --</option>
@@ -81,20 +53,64 @@ else
     </div>
 
     <div class="col-md-2">
+        <input asp-for="PlannedDuration" class="form-control" placeholder="Duración (seg)" />
+    </div>
+
+    <div class="col-md-2">
         <button class="btn btn-primary">Agregar</button>
     </div>
 </form>
 
-<hr />
-<h4>Cardio (Final del día)</h4>
+<br />
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th>Ejercicio</th>
+            <th>Series</th>
+            <th>Reps</th>
+            <th>Duración (seg)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var e in Model.StrengthExercisesInDay)
+        {
+            <tr>
+                <td>@e.Exercise.Name</td>
+                <td>@e.PlannedSets</td>
+                <td>@(e.PlannedReps.HasValue ? e.PlannedReps.ToString() : "-")</td>
+                <td>@(e.PlannedDurationSeconds.HasValue ? e.PlannedDurationSeconds.ToString() : "-")</td>
+                <td class="text-end">
+                    <form method="post" asp-page-handler="RemoveExercise"
+                          asp-route-id="@Model.Day.Id"
+                          asp-route-exId="@e.Id">
+                        <button class="btn btn-sm btn-outline-danger">Quitar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<br />
 
-@if (Model.Day.Exercises.Any(e => e.Exercise.Type == Enums.ExerciseType.Cardio))
+<!-- ================= CARDIO ================= -->
+<h4>Cardio</h4>
+
+@if (Model.CardioExercisesInDay.Any())
 {
     <ul class="list-group mb-3">
-        @foreach (var c in Model.Day.Exercises.Where(e => e.Exercise.Type == Enums.ExerciseType.Cardio))
+        @foreach (var c in Model.CardioExercisesInDay)
         {
             <li class="list-group-item d-flex justify-content-between align-items-center">
-                @c.Exercise.Name
+                <span>
+                    @c.Exercise.Name
+                    @if (c.PlannedDurationSeconds.HasValue)
+                    {
+                        <span class="text-muted small">
+                            (@(c.PlannedDurationSeconds.Value / 60) min)
+                        </span>
+                    }
+                </span>
                 <form method="post" asp-page-handler="RemoveCardio"
                       asp-route-id="@Model.Day.Id"
                       asp-route-exId="@c.Id">
@@ -120,10 +136,16 @@ else
         </select>
     </div>
     <div class="col-md-2">
+        <input asp-for="PlannedDuration" class="form-control" placeholder="Duración (seg)" />
+    </div>
+
+    <div class="col-md-2">
         <button class="btn btn-primary">Agregar Cardio</button>
     </div>
 </form>
+
 <br />
+
 <a asp-page="Index" class="btn btn-outline-secondary">
     ← Volver
 </a>

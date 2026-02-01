@@ -7,45 +7,53 @@
 
 <h2 class="mb-4">✏️ Editar ejercicio</h2>
 
+<!-- ================= ALERTAS ================= -->
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<!-- ================= FORMULARIO DE EDICIÓN ================= -->
 <form method="post" class="card shadow-sm p-4">
 
-    <input type="hidden" asp-for="Exercise.Id" />
+    <input type="hidden" asp-for="Exercise!.Id" />
 
     <!-- NOMBRE -->
     <div class="mb-3">
-        <label asp-for="Exercise.Name" class="form-label fw-semibold"></label>
-        <input asp-for="Exercise.Name" class="form-control" />
-        <span asp-validation-for="Exercise.Name" class="text-danger"></span>
+        <label asp-for="Exercise!.Name" class="form-label fw-semibold"></label>
+        <input asp-for="Exercise!.Name" class="form-control" />
+        <span asp-validation-for="Exercise!.Name" class="text-danger"></span>
     </div>
 
     <!-- TIPO -->
     <div class="mb-3">
-        <label asp-for="Exercise.Type" class="form-label fw-semibold"></label>
-        <select asp-for="Exercise.Type"
+        <label asp-for="Exercise!.Type" class="form-label fw-semibold"></label>
+        <select asp-for="Exercise!.Type"
                 asp-items="Model.ExerciseTypes"
                 class="form-select"
                 id="exerciseType">
         </select>
     </div>
 
-    <!-- MUSCULO -->
+    <!-- MÚSCULO -->
     <div class="mb-4">
         <label class="form-label fw-semibold">Músculo</label>
-
-        <select asp-for="Exercise.MuscleId"
+        <select asp-for="Exercise!.MuscleId"
                 asp-items="Model.Muscles"
                 class="form-select"
                 id="muscleSelect">
             <option value="">— Sin músculo (Cardio) —</option>
         </select>
-
         <div class="form-text text-muted">
             Solo aplica para ejercicios de fuerza.
         </div>
     </div>
 
-
-    <!-- ACCIONES -->
+    <!-- BOTONES GUARDAR Y CANCELAR -->
     <div class="d-flex justify-content-end gap-2">
         <a asp-page="Index" class="btn btn-outline-secondary">
             Cancelar
@@ -57,6 +65,16 @@
     </div>
 
 </form>
+
+<!-- ================= BOTÓN ELIMINAR ================= -->
+<div class="mt-4">
+    <form method="post" asp-page-handler="Delete" asp-route-id="@Model.Exercise!.Id" class="d-inline">
+        <button type="submit" class="btn btn-danger"
+                onclick="return confirm('¿Está seguro de eliminar este ejercicio? Esta acción solo se permitirá si ningún usuario lo ha usado.')">
+            Eliminar ejercicio
+        </button>
+    </form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
@@ -76,7 +94,6 @@
         }
 
         toggleMuscleSelect();
-
         typeSelect.addEventListener('change', toggleMuscleSelect);
     </script>
 }

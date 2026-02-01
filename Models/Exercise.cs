@@ -15,6 +15,9 @@ namespace GymTracker.Models
 
     public int? MuscleId { get; set; }
     public Muscle? Muscle { get; set; }
+
+    public string? Notes { get; set; }
+
   }
 
 }

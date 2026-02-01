@@ -2,6 +2,11 @@
 @model GymTracker.Pages.WorkoutSessions.CreateModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
+@{
+    ViewData["Title"] = "Crear Serie";
+}
+
+
 <h2>Entrenamiento del día (@Model.SelectedDate?.ToShortDateString())</h2>
 
 <hr />
@@ -9,10 +14,13 @@
 
 <!-- Selector de fecha -->
 <div class="mb-3">
-    <label for="sessionDate" class="form-label">Selecciona la fecha de la sesión:</label>
-    <input type="date" id="sessionDate" class="form-control"
-           asp-for="SelectedDate"
-           onchange="onDateChange()" />
+    <label for="sessionDate" class="form-label">
+        Selecciona la fecha de la sesión, los dias de semana habilitados son los activos en sus 
+          <a asp-page="/Maintenance/WorkoutDays/Index">  dias de entrenamiento programados </a>
+    </label>
+<input type="text" id="sessionDate" class="form-control"
+       value="@Model.SelectedDate?.ToString("yyyy-MM-dd")" />
+
 </div>
 
 <!-- Mensajes generales del modelo -->
@@ -51,6 +59,7 @@
     <div class="tab-pane fade show active" id="strength" role="tabpanel">
         <form method="post" asp-page-handler="AddStrength" class="row g-2 mb-3">
             <input type="hidden" asp-for="ActiveTab" value="strength" />
+            <input type="hidden" asp-for="SelectedDate" /> <!-- <--- Asegura que la fecha llegue al POST -->
 
             <!-- Selección de ejercicio -->
             <div class="col-md-3">
@@ -58,21 +67,21 @@
                     <option value="">-- Selecciona ejercicio --</option>
                     @if (Model.StrengthRoutineExercises.Any())
                     {
-                        <optgroup label="🔥 Rutina de hoy">
+                            <optgroup label="🔥 Rutina de hoy">
                             @foreach (var e in Model.StrengthRoutineExercises)
                             {
-                                <option value="@e.Id">@e.Name</option>
+                                        <option value="@e.Id">@e.Name</option>
                             }
-                        </optgroup>
+                            </optgroup>
                     }
                     @if (Model.StrengthOtherExercises.Any())
                     {
-                        <optgroup label="➕ Otros ejercicios">
+                            <optgroup label="➕ Otros ejercicios">
                             @foreach (var e in Model.StrengthOtherExercises)
                             {
-                                <option value="@e.Id">@e.Name</option>
+                                        <option value="@e.Id">@e.Name</option>
                             }
-                        </optgroup>
+                            </optgroup>
                     }
                 </select>
                 <span class="text-danger" asp-validation-for="SelectedStrengthId"></span>
@@ -84,7 +93,7 @@
                     <option value="">-- Reps --</option>
                     @for (int i = 1; i <= 30; i++)
                     {
-                        <option value="@i">@i</option>
+                            <option value="@i">@i</option>
                     }
                 </select>
                 <span class="text-danger" asp-validation-for="Reps"></span>
@@ -117,20 +126,21 @@
             <tbody>
                 @foreach (var s in Model.Sets)
                 {
-                    <tr>
-                        <td>@s.Exercise.Name</td>
-                        <td>@s.SetNumber</td>
-                        <td>@s.Reps</td>
-                        <td>@s.Weight</td>
-                        <td>@s.Volume</td>
-                        <td>
-                            <form method="post"
-                                  asp-page-handler="RemoveStrength"
-                                  asp-route-id="@s.Id">
-                                <button class="btn btn-sm btn-outline-danger">Quitar</button>
-                            </form>
-                        </td>
-                    </tr>
+                        <tr>
+                            <td>@s.Exercise.Name</td>
+                            <td>@s.SetNumber</td>
+                            <td>@s.Reps</td>
+                            <td>@s.Weight</td>
+                            <td>@s.Volume</td>
+                            <td>
+                                <form method="post"
+                                      asp-page-handler="RemoveStrength"
+                                      asp-route-id="@s.Id">
+                                    <input type="hidden" asp-for="SelectedDate" /> <!-- <--- También aquí -->
+                                    <button class="btn btn-sm btn-outline-danger">Quitar</button>
+                                </form>
+                            </td>
+                        </tr>
                 }
             </tbody>
         </table>
@@ -140,6 +150,7 @@
     <div class="tab-pane fade" id="cardio" role="tabpanel">
         <form method="post" asp-page-handler="AddCardio" class="row g-2 mb-3">
             <input type="hidden" asp-for="ActiveTab" value="cardio" />
+            <input type="hidden" asp-for="SelectedDate" /> <!-- <--- Fecha también enviada -->
 
             <!-- Selección de ejercicio cardio -->
             <div class="col-md-3">
@@ -147,21 +158,21 @@
                     <option value="">-- Selecciona cardio --</option>
                     @if (Model.CardioRoutineExercises.Any())
                     {
-                        <optgroup label="🔥 Cardio programado">
+                            <optgroup label="🔥 Cardio programado">
                             @foreach (var e in Model.CardioRoutineExercises)
                             {
-                                <option value="@e.Id">@e.Name</option>
+                                        <option value="@e.Id">@e.Name</option>
                             }
-                        </optgroup>
+                            </optgroup>
                     }
                     @if (Model.CardioOtherExercises.Any())
                     {
-                        <optgroup label="➕ Otros cardio">
+                            <optgroup label="➕ Otros cardio">
                             @foreach (var e in Model.CardioOtherExercises)
                             {
-                                <option value="@e.Id">@e.Name</option>
+                                        <option value="@e.Id">@e.Name</option>
                             }
-                        </optgroup>
+                            </optgroup>
                     }
                 </select>
                 <span class="text-danger" asp-validation-for="SelectedCardioId"></span>
@@ -202,8 +213,8 @@
             <thead>
                 <tr>
                     <th>Ejercicio</th>
-                    <th>Duración</th>
-                    <th>Distancia</th>
+                    <th>Duración (min)</th>
+                    <th>Distancia (km)</th>
                     <th>Calorías</th>
                     <th>FC media</th>
                     <th></th>
@@ -212,20 +223,21 @@
             <tbody>
                 @foreach (var c in Model.CardioSessions)
                 {
-                    <tr>
-                        <td>@c.Exercise.Name</td>
-                        <td>@c.DurationMinutes</td>
-                        <td>@c.DistanceKm</td>
-                        <td>@c.Calories</td>
-                        <td>@c.AvgHeartRate</td>
-                        <td>
-                            <form method="post"
-                                  asp-page-handler="RemoveCardio"
-                                  asp-route-id="@c.Id">
-                                <button class="btn btn-sm btn-outline-danger">Quitar</button>
-                            </form>
-                        </td>
-                    </tr>
+                        <tr>
+                            <td>@c.Exercise.Name</td>
+                            <td>@c.DurationMinutes</td>
+                            <td>@c.DistanceKm</td>
+                            <td>@c.Calories</td>
+                            <td>@c.AvgHeartRate</td>
+                            <td>
+                                <form method="post"
+                                      asp-page-handler="RemoveCardio"
+                                      asp-route-id="@c.Id">
+                                    <input type="hidden" asp-for="SelectedDate" /> 
+                                    <button class="btn btn-sm btn-outline-danger">Quitar</button>
+                                </form>
+                            </td>
+                        </tr>
                 }
             </tbody>
         </table>
@@ -233,21 +245,25 @@
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+        <partial name="_ValidationScriptsPartial" />
 
-    <script>
-        function onDateChange() {
-            var date = document.getElementById('sessionDate').value;
-            if(date) window.location.href = '?date=' + date;
-        }
+        <script>
+            // Días permitidos: del servidor
+            var allowedDays = @Html.Raw(Json.Serialize(Model.WorkoutDays.Select(d => (int)d)));
+            console.log("allowedDays:", allowedDays);
 
-        document.addEventListener("DOMContentLoaded", function() {
-            var activeTab = "@Model.ActiveTab";
-            if (activeTab) {
-                var triggerEl = document.querySelector(`#${activeTab}-tab`);
-                var tab = new bootstrap.Tab(triggerEl);
-                tab.show();
-            }
-        });
-    </script>
+            flatpickr("#sessionDate", {
+                dateFormat: "Y-m-d",
+                defaultDate: "@Model.SelectedDate?.ToString("yyyy-MM-dd")",
+                disable: [
+                    function(date) {
+                        return !allowedDays.includes(date.getDay());
+                    }
+                ],
+                onChange: function(selectedDates, dateStr) {
+                    if(dateStr) window.location.href = '?date=' + dateStr;
+                }
+            });
+
+        </script>
 }

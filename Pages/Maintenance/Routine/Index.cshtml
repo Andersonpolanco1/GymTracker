@@ -2,6 +2,11 @@
 @model GymTracker.Pages.Maintenance.Routine.IndexModel
 @using GymTracker.Enums
 
+@{
+    ViewData["Title"] = "Editar Rutina";
+}
+
+
 <h2 class="mb-1">Rutina Semanal</h2>
 <br />
 <div class="mb-4">
@@ -40,7 +45,15 @@
                                         <li>
                                             @e.Name
                                             <span class="text-muted">
-                                                (@e.Sets x @e.Reps)
+                                                (@e.Sets x
+                                                @if (e.Reps.HasValue)
+                                                {
+                                                    @e.Reps
+                                                }
+                                                else if (e.DurationsSeconds.HasValue)
+                                                {
+                                                    @($"{e.DurationsSeconds} segundos")
+                                                })
                                             </span>
                                         </li>
                                     }
@@ -57,7 +70,15 @@
                             <ul class="mb-0">
                                 @foreach (var c in day.CardioExercises)
                                 {
-                                    <li>@c.Name</li>
+                                    <li>
+                                        @c.Name
+                                        @if (c.PlannedDurationSeconds.HasValue)
+                                        {
+                                            var minutes = c.PlannedDurationSeconds.Value / 60;
+                                            <span class="text-muted">(@minutes min)</span>
+                                        }
+                                    </li>
+
                                 }
                             </ul>
                         </div>

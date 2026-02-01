@@ -1,6 +1,11 @@
 ﻿@page
 @model GymTracker.Pages.Maintenance.Exercises.IndexModel
 
+@{
+    ViewData["Title"] = "Ejercicios";
+}
+
+
 <h2 class="mb-4">Ejercicios</h2>
 
 <div class="mb-3 d-flex justify-content-between align-items-center">
@@ -55,11 +60,6 @@
                     <a asp-page="Edit" asp-route-id="@exercise.Id"
                        class="btn btn-sm btn-outline-warning">
                         Editar
-                    </a>
-
-                    <a asp-page="Delete" asp-route-id="@exercise.Id"
-                       class="btn btn-sm btn-outline-danger ms-1">
-                        Eliminar
                     </a>
                 </td>
             </tr>

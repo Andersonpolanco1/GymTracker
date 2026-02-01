@@ -1,33 +1,29 @@
 using GymTracker.Enums;
 using GymTracker.Models;
-using GymTracker;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
-namespace GymTracker.Pages.Maintenance.WorkoutDays
+namespace GymTracker.Pages.Maintenance.Routine
 {
-  public class EditModel : PageModel
+  public class EditModel(GymTrackerDbContext context) : PageModel
   {
-    private readonly GymTrackerDbContext context;
-
-    public EditModel(GymTrackerDbContext context)
-    {
-      this.context = context;
-    }
-
     [BindProperty]
     public WorkoutDay? Day { get; set; } = null!;
+
+    // Listas separadas de ejercicios ya filtradas por tipo
+    public List<WorkoutDayExercise> StrengthExercisesInDay { get; set; } = [];
+    public List<WorkoutDayExercise> CardioExercisesInDay { get; set; } = [];
 
     public List<Exercise> StrengthExercises { get; set; } = [];
     public List<Exercise> CardioExercises { get; set; } = [];
 
-    // SOLO UI (derivado)
     public List<string> Muscles { get; set; } = [];
 
     [BindProperty] public int ExerciseId { get; set; }
     [BindProperty] public int PlannedSets { get; set; } = 3;
-    [BindProperty] public int PlannedReps { get; set; } = 12;
+    [BindProperty] public int? PlannedReps { get; set; }
+    [BindProperty] public int? PlannedDuration { get; set; }
 
     [BindProperty] public int CardioExerciseId { get; set; }
 
@@ -42,10 +38,17 @@ namespace GymTracker.Pages.Maintenance.WorkoutDays
       if (Day == null)
         return NotFound();
 
-      Muscles = Day.Exercises
-          .Where(e =>
-              e.Exercise.Type == ExerciseType.Strength &&
-              e.Exercise.Muscle != null)
+      // Separar ejercicios por tipo
+      StrengthExercisesInDay = Day.Exercises
+          .Where(e => e.Exercise.Type == ExerciseType.Strength)
+          .ToList();
+
+      CardioExercisesInDay = Day.Exercises
+          .Where(e => e.Exercise.Type == ExerciseType.Cardio)
+          .ToList();
+
+      Muscles = StrengthExercisesInDay
+          .Where(e => e.Exercise.Muscle != null)
           .Select(e => e.Exercise.Muscle!.Name)
           .Distinct()
           .OrderBy(m => m)
@@ -65,26 +68,21 @@ namespace GymTracker.Pages.Maintenance.WorkoutDays
     }
 
     // ================= FUERZA =================
-
     public async Task<IActionResult> OnPostAddExerciseAsync(int id)
     {
-      if (!context.Set<WorkoutDayExercise>()
-          .Any(x => x.WorkoutDayId == id && x.ExerciseId == ExerciseId))
-      { 
-      
+      if (!context.Set<WorkoutDayExercise>().Any(x => x.WorkoutDayId == id && x.ExerciseId == ExerciseId))
+      {
         context.Add(new WorkoutDayExercise
         {
           WorkoutDayId = id,
           ExerciseId = ExerciseId,
           PlannedSets = PlannedSets,
-          PlannedReps = PlannedReps
+          PlannedReps = PlannedReps,
+          PlannedDurationSeconds = PlannedDuration
         });
 
         await context.SaveChangesAsync();
-      
       }
-
-
 
       return RedirectToPage(new { id });
     }
@@ -104,7 +102,6 @@ namespace GymTracker.Pages.Maintenance.WorkoutDays
     }
 
     // ================= CARDIO =================
-
     public async Task<IActionResult> OnPostAddCardioAsync(int id)
     {
       if (!context.Set<WorkoutDayExercise>()
@@ -115,7 +112,8 @@ namespace GymTracker.Pages.Maintenance.WorkoutDays
           WorkoutDayId = id,
           ExerciseId = CardioExerciseId,
           PlannedSets = 0,
-          PlannedReps = 0
+          PlannedReps = 0,
+          PlannedDurationSeconds = PlannedDuration 
         });
 
         await context.SaveChangesAsync();
@@ -123,6 +121,7 @@ namespace GymTracker.Pages.Maintenance.WorkoutDays
 
       return RedirectToPage(new { id });
     }
+
 
     public async Task<IActionResult> OnPostRemoveCardioAsync(int id, int exId)
     {
