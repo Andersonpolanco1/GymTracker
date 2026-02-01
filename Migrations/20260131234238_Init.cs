@@ -8,11 +8,51 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GymTracker.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "AspNetRoles",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUsers",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DisplayName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Muscles",
                 columns: table => new
@@ -27,16 +67,129 @@ namespace GymTracker.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AspNetRoleClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUserClaims_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserLogins",
+                columns: table => new
+                {
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserLogins_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserRoles",
+                columns: table => new
+                {
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AspNetUserRoles_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserTokens",
+                columns: table => new
+                {
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserTokens_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "WorkoutDays",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    DayOfWeek = table.Column<int>(type: "int", nullable: false)
+                    DayOfWeek = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_WorkoutDays", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WorkoutDays_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -66,21 +219,28 @@ namespace GymTracker.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     WorkoutDayId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_WorkoutSessions", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_WorkoutSessions_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_WorkoutSessions_WorkoutDays_WorkoutDayId",
                         column: x => x.WorkoutDayId,
                         principalTable: "WorkoutDays",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "WorkoutDayExercise",
+                name: "WorkoutDayExercises",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -92,15 +252,15 @@ namespace GymTracker.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WorkoutDayExercise", x => x.Id);
+                    table.PrimaryKey("PK_WorkoutDayExercises", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_WorkoutDayExercise_Exercises_ExerciseId",
+                        name: "FK_WorkoutDayExercises_Exercises_ExerciseId",
                         column: x => x.ExerciseId,
                         principalTable: "Exercises",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_WorkoutDayExercise_WorkoutDays_WorkoutDayId",
+                        name: "FK_WorkoutDayExercises_WorkoutDays_WorkoutDayId",
                         column: x => x.WorkoutDayId,
                         principalTable: "WorkoutDays",
                         principalColumn: "Id",
@@ -116,7 +276,7 @@ namespace GymTracker.Migrations
                     WorkoutSessionId = table.Column<int>(type: "int", nullable: false),
                     ExerciseId = table.Column<int>(type: "int", nullable: false),
                     DurationMinutes = table.Column<int>(type: "int", nullable: false),
-                    DistanceKm = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    DistanceKm = table.Column<decimal>(type: "decimal(6,2)", precision: 6, scale: 2, nullable: true),
                     Calories = table.Column<int>(type: "int", nullable: true),
                     AvgHeartRate = table.Column<int>(type: "int", nullable: true)
                 },
@@ -147,7 +307,7 @@ namespace GymTracker.Migrations
                     ExerciseId = table.Column<int>(type: "int", nullable: false),
                     SetNumber = table.Column<int>(type: "int", nullable: false),
                     Reps = table.Column<int>(type: "int", nullable: false),
-                    Weight = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Weight = table.Column<decimal>(type: "decimal(6,2)", precision: 6, scale: 2, nullable: false),
                     RIR = table.Column<int>(type: "int", nullable: true),
                     RestSeconds = table.Column<int>(type: "int", nullable: true)
                 },
@@ -189,19 +349,6 @@ namespace GymTracker.Migrations
                     { 5, "Pecho" },
                     { 6, "Triceps" },
                     { 7, "Abdomen" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "WorkoutDays",
-                columns: new[] { "Id", "DayOfWeek" },
-                values: new object[,]
-                {
-                    { 1, 1 },
-                    { 2, 2 },
-                    { 3, 3 },
-                    { 4, 4 },
-                    { 5, 5 },
-                    { 6, 6 }
                 });
 
             migrationBuilder.InsertData(
@@ -251,56 +398,44 @@ namespace GymTracker.Migrations
                     { 65, 7, "Plancha lateral", 1 }
                 });
 
-            migrationBuilder.InsertData(
-                table: "WorkoutDayExercise",
-                columns: new[] { "Id", "ExerciseId", "PlannedReps", "PlannedSets", "WorkoutDayId" },
-                values: new object[,]
-                {
-                    { 6, 101, 15, 1, 1 },
-                    { 13, 100, 15, 1, 2 },
-                    { 28, 101, 15, 1, 4 },
-                    { 36, 100, 15, 1, 5 },
-                    { 1, 1, 12, 3, 1 },
-                    { 2, 2, 10, 3, 1 },
-                    { 3, 3, 12, 3, 1 },
-                    { 4, 10, 12, 3, 1 },
-                    { 5, 11, 10, 3, 1 },
-                    { 7, 20, 12, 3, 2 },
-                    { 8, 21, 12, 3, 2 },
-                    { 9, 22, 12, 3, 2 },
-                    { 10, 23, 15, 3, 2 },
-                    { 11, 30, 10, 3, 2 },
-                    { 12, 31, 12, 3, 2 },
-                    { 14, 40, 12, 3, 3 },
-                    { 15, 41, 10, 3, 3 },
-                    { 16, 42, 12, 3, 3 },
-                    { 17, 50, 12, 3, 3 },
-                    { 18, 51, 12, 3, 3 },
-                    { 19, 60, 15, 3, 3 },
-                    { 20, 61, 60, 3, 3 },
-                    { 21, 62, 12, 3, 3 },
-                    { 22, 4, 12, 3, 4 },
-                    { 23, 5, 12, 3, 4 },
-                    { 24, 6, 12, 3, 4 },
-                    { 25, 12, 12, 3, 4 },
-                    { 26, 13, 12, 3, 4 },
-                    { 27, 14, 12, 3, 4 },
-                    { 29, 24, 12, 3, 5 },
-                    { 30, 25, 12, 3, 5 },
-                    { 31, 26, 12, 3, 5 },
-                    { 32, 27, 15, 3, 5 },
-                    { 33, 32, 10, 3, 5 },
-                    { 34, 33, 12, 3, 5 },
-                    { 35, 34, 12, 3, 5 },
-                    { 37, 43, 12, 3, 6 },
-                    { 38, 44, 12, 3, 6 },
-                    { 39, 45, 12, 3, 6 },
-                    { 40, 52, 12, 3, 6 },
-                    { 41, 53, 12, 3, 6 },
-                    { 42, 63, 12, 3, 6 },
-                    { 43, 64, 12, 3, 6 },
-                    { 44, 65, 60, 3, 6 }
-                });
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetRoleClaims_RoleId",
+                table: "AspNetRoleClaims",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "RoleNameIndex",
+                table: "AspNetRoles",
+                column: "NormalizedName",
+                unique: true,
+                filter: "[NormalizedName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserClaims_UserId",
+                table: "AspNetUserClaims",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserLogins_UserId",
+                table: "AspNetUserLogins",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserRoles_RoleId",
+                table: "AspNetUserRoles",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "EmailIndex",
+                table: "AspNetUsers",
+                column: "NormalizedEmail");
+
+            migrationBuilder.CreateIndex(
+                name: "UserNameIndex",
+                table: "AspNetUsers",
+                column: "NormalizedUserName",
+                unique: true,
+                filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CardioSessions_ExerciseId",
@@ -328,14 +463,24 @@ namespace GymTracker.Migrations
                 column: "WorkoutSessionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WorkoutDayExercise_ExerciseId",
-                table: "WorkoutDayExercise",
+                name: "IX_WorkoutDayExercises_ExerciseId",
+                table: "WorkoutDayExercises",
                 column: "ExerciseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WorkoutDayExercise_WorkoutDayId",
-                table: "WorkoutDayExercise",
+                name: "IX_WorkoutDayExercises_WorkoutDayId",
+                table: "WorkoutDayExercises",
                 column: "WorkoutDayId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkoutDays_UserId",
+                table: "WorkoutDays",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkoutSessions_UserId",
+                table: "WorkoutSessions",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WorkoutSessions_WorkoutDayId",
@@ -347,13 +492,31 @@ namespace GymTracker.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "AspNetRoleClaims");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserClaims");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserLogins");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserRoles");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
                 name: "CardioSessions");
 
             migrationBuilder.DropTable(
                 name: "ExerciseSets");
 
             migrationBuilder.DropTable(
-                name: "WorkoutDayExercise");
+                name: "WorkoutDayExercises");
+
+            migrationBuilder.DropTable(
+                name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "WorkoutSessions");
@@ -366,6 +529,9 @@ namespace GymTracker.Migrations
 
             migrationBuilder.DropTable(
                 name: "Muscles");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
         }
     }
 }

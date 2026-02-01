@@ -1,33 +1,37 @@
 using GymTracker.Enums;
 using GymTracker.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
 namespace GymTracker.Pages.WorkoutSessions
 {
-  public class CreateModel : PageModel
+  public class CreateModel(
+      GymTrackerDbContext context,
+      UserManager<ApplicationUser> userManager) : PageModel
   {
-    private readonly GymTrackerDbContext context;
-    public CreateModel(GymTrackerDbContext context) => this.context = context;
+
+    private string UserId => userManager.GetUserId(User)!;
 
     public WorkoutSession? Session { get; set; }
 
     // Ejercicios
-    public List<Exercise> StrengthRoutineExercises { get; set; } = new();
-    public List<Exercise> StrengthOtherExercises { get; set; } = new();
-    public List<Exercise> CardioRoutineExercises { get; set; } = new();
-    public List<Exercise> CardioOtherExercises { get; set; } = new();
+    public List<Exercise> StrengthRoutineExercises { get; set; } = [];
+    public List<Exercise> StrengthOtherExercises { get; set; } = [];
+    public List<Exercise> CardioRoutineExercises { get; set; } = [];
+    public List<Exercise> CardioOtherExercises { get; set; } = [];
 
-    // Series registradas
-    public List<ExerciseSet> Sets { get; set; } = new();
-    public List<CardioSession> CardioSessions { get; set; } = new();
+    // Series
+    public List<ExerciseSet> Sets { get; set; } = [];
+    public List<CardioSession> CardioSessions { get; set; } = [];
 
-    // BindProperties
+    // Inputs fuerza
     [BindProperty] public int SelectedStrengthId { get; set; }
     [BindProperty] public int? Reps { get; set; }
     [BindProperty] public decimal? Weight { get; set; }
 
+    // Inputs cardio
     [BindProperty] public int SelectedCardioId { get; set; }
     [BindProperty] public int? DurationMinutes { get; set; }
     [BindProperty] public decimal? DistanceKm { get; set; }
@@ -38,8 +42,8 @@ namespace GymTracker.Pages.WorkoutSessions
 
     // Fecha seleccionada
     [BindProperty] public DateTime? SelectedDate { get; set; }
-    public string? DateErrorMessage { get; set; }
 
+    // ================= GET =================
     public async Task<IActionResult> OnGetAsync(DateTime? date)
     {
       SelectedDate = date ?? DateTime.Today;
@@ -47,6 +51,7 @@ namespace GymTracker.Pages.WorkoutSessions
       return Page();
     }
 
+    // ================= CARGA GENERAL =================
     private async Task LoadExercisesAsync(DateTime date)
     {
       var dayOfWeek = date.DayOfWeek;
@@ -82,26 +87,21 @@ namespace GymTracker.Pages.WorkoutSessions
           .OrderBy(e => e.Name)
           .ToListAsync();
 
-      // Cargar sesión si existe
+      //  Cargar sesión SOLO del usuario
       Session = await context.WorkoutSessions
           .Include(s => s.Sets)
               .ThenInclude(es => es.Exercise)
           .Include(s => s.CardioSessions)
               .ThenInclude(cs => cs.Exercise)
-          .FirstOrDefaultAsync(s => s.Date == date);
+          .FirstOrDefaultAsync(s =>
+              s.Date == date &&
+              s.UserId == UserId);
 
-      if (Session != null)
-      {
-        Sets = Session.Sets.ToList();
-        CardioSessions = Session.CardioSessions.ToList();
-      }
-      else
-      {
-        Sets.Clear();
-        CardioSessions.Clear();
-      }
+      Sets = Session?.Sets.ToList() ?? [];
+      CardioSessions = Session?.CardioSessions.ToList() ?? [];
     }
 
+    // ================= FUERZA =================
     public async Task<IActionResult> OnPostAddStrengthAsync()
     {
       if (SelectedStrengthId == 0)
@@ -113,7 +113,8 @@ namespace GymTracker.Pages.WorkoutSessions
       if (Weight is null || Weight <= 0)
         ModelState.AddModelError(nameof(Weight), "Debes indicar el peso");
 
-      if (!ModelState.IsValid) return await OnGetAsync(SelectedDate);
+      if (!ModelState.IsValid)
+        return await OnGetAsync(SelectedDate);
 
       var session = await GetOrCreateSessionAsync(SelectedDate ?? DateTime.Today);
 
@@ -132,9 +133,11 @@ namespace GymTracker.Pages.WorkoutSessions
       });
 
       await context.SaveChangesAsync();
+
       return RedirectToPage(new { date = SelectedDate?.ToString("yyyy-MM-dd") });
     }
 
+    // ================= CARDIO =================
     public async Task<IActionResult> OnPostAddCardioAsync()
     {
       if (SelectedCardioId == 0)
@@ -143,7 +146,8 @@ namespace GymTracker.Pages.WorkoutSessions
       if (DurationMinutes is null || DurationMinutes <= 0)
         ModelState.AddModelError(nameof(DurationMinutes), "Debes indicar la duración");
 
-      if (!ModelState.IsValid) return await OnGetAsync(SelectedDate);
+      if (!ModelState.IsValid)
+        return await OnGetAsync(SelectedDate);
 
       var session = await GetOrCreateSessionAsync(SelectedDate ?? DateTime.Today);
 
@@ -158,9 +162,11 @@ namespace GymTracker.Pages.WorkoutSessions
       });
 
       await context.SaveChangesAsync();
+
       return RedirectToPage(new { date = SelectedDate?.ToString("yyyy-MM-dd") });
     }
 
+    // ================= REMOVE =================
     public async Task<IActionResult> OnPostRemoveStrengthAsync(int id)
     {
       var set = await context.ExerciseSets.FindAsync(id);
@@ -169,6 +175,7 @@ namespace GymTracker.Pages.WorkoutSessions
         context.ExerciseSets.Remove(set);
         await context.SaveChangesAsync();
       }
+
       return RedirectToPage(new { date = SelectedDate?.ToString("yyyy-MM-dd") });
     }
 
@@ -180,24 +187,30 @@ namespace GymTracker.Pages.WorkoutSessions
         context.CardioSessions.Remove(cardio);
         await context.SaveChangesAsync();
       }
+
       return RedirectToPage(new { date = SelectedDate?.ToString("yyyy-MM-dd") });
     }
 
+    // ================= SESIÓN =================
     private async Task<WorkoutSession> GetOrCreateSessionAsync(DateTime date)
     {
-      var dayOfWeek = date.DayOfWeek;
-      var workoutDay = await context.WorkoutDays.FirstAsync(d => d.DayOfWeek == dayOfWeek);
+      var workoutDay = await context.WorkoutDays
+          .FirstAsync(d => d.DayOfWeek == date.DayOfWeek);
 
       var session = await context.WorkoutSessions
-          .FirstOrDefaultAsync(s => s.Date == date);
+          .FirstOrDefaultAsync(s =>
+              s.Date == date &&
+              s.UserId == UserId);
 
       if (session == null)
       {
         session = new WorkoutSession
         {
           Date = date,
-          WorkoutDayId = workoutDay.Id
+          WorkoutDayId = workoutDay.Id,
+          UserId = UserId
         };
+
         context.WorkoutSessions.Add(session);
         await context.SaveChangesAsync();
       }

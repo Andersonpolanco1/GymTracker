@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GymTracker.Migrations
 {
     [DbContext(typeof(GymTrackerDbContext))]
-    [Migration("20260131205700_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260131234238_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,75 @@ namespace GymTracker.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("GymTracker.Models.ApplicationUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers", (string)null);
+                });
 
             modelBuilder.Entity("GymTracker.Models.CardioSession", b =>
                 {
@@ -40,7 +109,8 @@ namespace GymTracker.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal?>("DistanceKm")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(6, 2)
+                        .HasColumnType("decimal(6,2)");
 
                     b.Property<int>("DurationMinutes")
                         .HasColumnType("int");
@@ -403,7 +473,8 @@ namespace GymTracker.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Weight")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(6, 2)
+                        .HasColumnType("decimal(6,2)");
 
                     b.Property<int>("WorkoutSessionId")
                         .HasColumnType("int");
@@ -482,41 +553,15 @@ namespace GymTracker.Migrations
                     b.Property<int>("DayOfWeek")
                         .HasColumnType("int");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
-                    b.ToTable("WorkoutDays");
+                    b.HasIndex("UserId");
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            DayOfWeek = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            DayOfWeek = 2
-                        },
-                        new
-                        {
-                            Id = 3,
-                            DayOfWeek = 3
-                        },
-                        new
-                        {
-                            Id = 4,
-                            DayOfWeek = 4
-                        },
-                        new
-                        {
-                            Id = 5,
-                            DayOfWeek = 5
-                        },
-                        new
-                        {
-                            Id = 6,
-                            DayOfWeek = 6
-                        });
+                    b.ToTable("WorkoutDays");
                 });
 
             modelBuilder.Entity("GymTracker.Models.WorkoutDayExercise", b =>
@@ -545,361 +590,7 @@ namespace GymTracker.Migrations
 
                     b.HasIndex("WorkoutDayId");
 
-                    b.ToTable("WorkoutDayExercise");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ExerciseId = 1,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            ExerciseId = 2,
-                            PlannedReps = 10,
-                            PlannedSets = 3,
-                            WorkoutDayId = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            ExerciseId = 3,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 1
-                        },
-                        new
-                        {
-                            Id = 4,
-                            ExerciseId = 10,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 1
-                        },
-                        new
-                        {
-                            Id = 5,
-                            ExerciseId = 11,
-                            PlannedReps = 10,
-                            PlannedSets = 3,
-                            WorkoutDayId = 1
-                        },
-                        new
-                        {
-                            Id = 6,
-                            ExerciseId = 101,
-                            PlannedReps = 15,
-                            PlannedSets = 1,
-                            WorkoutDayId = 1
-                        },
-                        new
-                        {
-                            Id = 7,
-                            ExerciseId = 20,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 2
-                        },
-                        new
-                        {
-                            Id = 8,
-                            ExerciseId = 21,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 2
-                        },
-                        new
-                        {
-                            Id = 9,
-                            ExerciseId = 22,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 2
-                        },
-                        new
-                        {
-                            Id = 10,
-                            ExerciseId = 23,
-                            PlannedReps = 15,
-                            PlannedSets = 3,
-                            WorkoutDayId = 2
-                        },
-                        new
-                        {
-                            Id = 11,
-                            ExerciseId = 30,
-                            PlannedReps = 10,
-                            PlannedSets = 3,
-                            WorkoutDayId = 2
-                        },
-                        new
-                        {
-                            Id = 12,
-                            ExerciseId = 31,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 2
-                        },
-                        new
-                        {
-                            Id = 13,
-                            ExerciseId = 100,
-                            PlannedReps = 15,
-                            PlannedSets = 1,
-                            WorkoutDayId = 2
-                        },
-                        new
-                        {
-                            Id = 14,
-                            ExerciseId = 40,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 3
-                        },
-                        new
-                        {
-                            Id = 15,
-                            ExerciseId = 41,
-                            PlannedReps = 10,
-                            PlannedSets = 3,
-                            WorkoutDayId = 3
-                        },
-                        new
-                        {
-                            Id = 16,
-                            ExerciseId = 42,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 3
-                        },
-                        new
-                        {
-                            Id = 17,
-                            ExerciseId = 50,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 3
-                        },
-                        new
-                        {
-                            Id = 18,
-                            ExerciseId = 51,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 3
-                        },
-                        new
-                        {
-                            Id = 19,
-                            ExerciseId = 60,
-                            PlannedReps = 15,
-                            PlannedSets = 3,
-                            WorkoutDayId = 3
-                        },
-                        new
-                        {
-                            Id = 20,
-                            ExerciseId = 61,
-                            PlannedReps = 60,
-                            PlannedSets = 3,
-                            WorkoutDayId = 3
-                        },
-                        new
-                        {
-                            Id = 21,
-                            ExerciseId = 62,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 3
-                        },
-                        new
-                        {
-                            Id = 22,
-                            ExerciseId = 4,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 4
-                        },
-                        new
-                        {
-                            Id = 23,
-                            ExerciseId = 5,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 4
-                        },
-                        new
-                        {
-                            Id = 24,
-                            ExerciseId = 6,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 4
-                        },
-                        new
-                        {
-                            Id = 25,
-                            ExerciseId = 12,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 4
-                        },
-                        new
-                        {
-                            Id = 26,
-                            ExerciseId = 13,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 4
-                        },
-                        new
-                        {
-                            Id = 27,
-                            ExerciseId = 14,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 4
-                        },
-                        new
-                        {
-                            Id = 28,
-                            ExerciseId = 101,
-                            PlannedReps = 15,
-                            PlannedSets = 1,
-                            WorkoutDayId = 4
-                        },
-                        new
-                        {
-                            Id = 29,
-                            ExerciseId = 24,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 5
-                        },
-                        new
-                        {
-                            Id = 30,
-                            ExerciseId = 25,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 5
-                        },
-                        new
-                        {
-                            Id = 31,
-                            ExerciseId = 26,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 5
-                        },
-                        new
-                        {
-                            Id = 32,
-                            ExerciseId = 27,
-                            PlannedReps = 15,
-                            PlannedSets = 3,
-                            WorkoutDayId = 5
-                        },
-                        new
-                        {
-                            Id = 33,
-                            ExerciseId = 32,
-                            PlannedReps = 10,
-                            PlannedSets = 3,
-                            WorkoutDayId = 5
-                        },
-                        new
-                        {
-                            Id = 34,
-                            ExerciseId = 33,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 5
-                        },
-                        new
-                        {
-                            Id = 35,
-                            ExerciseId = 34,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 5
-                        },
-                        new
-                        {
-                            Id = 36,
-                            ExerciseId = 100,
-                            PlannedReps = 15,
-                            PlannedSets = 1,
-                            WorkoutDayId = 5
-                        },
-                        new
-                        {
-                            Id = 37,
-                            ExerciseId = 43,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 6
-                        },
-                        new
-                        {
-                            Id = 38,
-                            ExerciseId = 44,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 6
-                        },
-                        new
-                        {
-                            Id = 39,
-                            ExerciseId = 45,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 6
-                        },
-                        new
-                        {
-                            Id = 40,
-                            ExerciseId = 52,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 6
-                        },
-                        new
-                        {
-                            Id = 41,
-                            ExerciseId = 53,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 6
-                        },
-                        new
-                        {
-                            Id = 42,
-                            ExerciseId = 63,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 6
-                        },
-                        new
-                        {
-                            Id = 43,
-                            ExerciseId = 64,
-                            PlannedReps = 12,
-                            PlannedSets = 3,
-                            WorkoutDayId = 6
-                        },
-                        new
-                        {
-                            Id = 44,
-                            ExerciseId = 65,
-                            PlannedReps = 60,
-                            PlannedSets = 3,
-                            WorkoutDayId = 6
-                        });
+                    b.ToTable("WorkoutDayExercises");
                 });
 
             modelBuilder.Entity("GymTracker.Models.WorkoutSession", b =>
@@ -913,14 +604,153 @@ namespace GymTracker.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int>("WorkoutDayId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId");
+
                     b.HasIndex("WorkoutDayId");
 
                     b.ToTable("WorkoutSessions");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", (string)null);
                 });
 
             modelBuilder.Entity("GymTracker.Models.CardioSession", b =>
@@ -970,12 +800,23 @@ namespace GymTracker.Migrations
                     b.Navigation("WorkoutSession");
                 });
 
+            modelBuilder.Entity("GymTracker.Models.WorkoutDay", b =>
+                {
+                    b.HasOne("GymTracker.Models.ApplicationUser", "User")
+                        .WithMany("WorkoutDays")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("GymTracker.Models.WorkoutDayExercise", b =>
                 {
                     b.HasOne("GymTracker.Models.Exercise", "Exercise")
                         .WithMany()
                         .HasForeignKey("ExerciseId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("GymTracker.Models.WorkoutDay", "WorkoutDay")
@@ -991,13 +832,79 @@ namespace GymTracker.Migrations
 
             modelBuilder.Entity("GymTracker.Models.WorkoutSession", b =>
                 {
-                    b.HasOne("GymTracker.Models.WorkoutDay", "WorkoutDay")
-                        .WithMany()
-                        .HasForeignKey("WorkoutDayId")
+                    b.HasOne("GymTracker.Models.ApplicationUser", "User")
+                        .WithMany("WorkoutSessions")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GymTracker.Models.WorkoutDay", "WorkoutDay")
+                        .WithMany("WorkoutSessions")
+                        .HasForeignKey("WorkoutDayId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+
                     b.Navigation("WorkoutDay");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.HasOne("GymTracker.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.HasOne("GymTracker.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GymTracker.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.HasOne("GymTracker.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GymTracker.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("WorkoutDays");
+
+                    b.Navigation("WorkoutSessions");
                 });
 
             modelBuilder.Entity("GymTracker.Models.Muscle", b =>
@@ -1008,6 +915,8 @@ namespace GymTracker.Migrations
             modelBuilder.Entity("GymTracker.Models.WorkoutDay", b =>
                 {
                     b.Navigation("Exercises");
+
+                    b.Navigation("WorkoutSessions");
                 });
 
             modelBuilder.Entity("GymTracker.Models.WorkoutSession", b =>

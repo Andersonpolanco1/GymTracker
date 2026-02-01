@@ -1,54 +1,66 @@
-using GymTracker.Enums;
-using GymTracker.ViewModels.MaintenanceModels;
+using GymTracker.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
-namespace GymTracker.Pages.Maintenance.WorkoutDays;
-
-public class IndexModel(GymTrackerDbContext context) : PageModel
+namespace GymTracker.Pages.Maintenance.WorkoutDays
 {
-  public List<WorkoutDaySummaryVm> Days { get; set; } = [];
-
-  public async Task OnGetAsync()
+  public class IndexModel(
+    GymTrackerDbContext context,
+    UserManager<ApplicationUser> userManager) : PageModel
   {
-    var daysRaw = await context.WorkoutDays
-        .Include(d => d.Exercises)
-            .ThenInclude(e => e.Exercise)
-                .ThenInclude(e => e.Muscle)
-        .OrderBy(d => d.DayOfWeek)
+    public List<DayItem> Days { get; set; } = [];
+
+    [BindProperty]
+    public List<DayOfWeek> SelectedDays { get; set; } = [];
+
+    public async Task OnGetAsync()
+    {
+      var userId = userManager.GetUserId(User)!;
+
+      var userDays = await context.WorkoutDays
+        .Where(x => x.UserId == userId)
+        .Select(x => x.DayOfWeek)
         .ToListAsync();
 
-    Days = daysRaw.Select(d => new WorkoutDaySummaryVm
+      Days = Enum.GetValues<DayOfWeek>()
+        .Where(d => d != DayOfWeek.Sunday)
+        .Select(d => new DayItem
+        {
+          Day = d,
+          IsSelected = userDays.Contains(d)
+        })
+        .ToList();
+    }
+
+    public async Task<IActionResult> OnPostAsync()
     {
-      Id = d.Id,
-      DayOfWeek = d.DayOfWeek,
+      var userId = userManager.GetUserId(User)!;
 
-      // Fuerza agrupada por músculo
-      MuscleGroups = d.Exercises
-            .Where(e =>
-                e.Exercise.Type == ExerciseType.Strength &&
-                e.Exercise.Muscle != null)
-            .GroupBy(e => e.Exercise.Muscle!.Name)
-            .OrderBy(g => g.Key)
-            .Select(g => new MuscleGroupVm
-            {
-              MuscleName = g.Key,
-              Exercises = g.Select(e => new ExerciseItemVm
-              {
-                Name = e.Exercise.Name,
-                Sets = e.PlannedSets,
-                Reps = e.PlannedReps
-              }).ToList()
-            })
-            .ToList(),
+      var existingDays = await context.WorkoutDays
+        .Where(x => x.UserId == userId)
+        .ToListAsync();
 
-      CardioExercises = d.Exercises
-            .Where(e => e.Exercise.Type == ExerciseType.Cardio)
-            .Select(e => new CardioItemVm
-            {
-              Name = e.Exercise.Name
-            })
-            .ToList()
-    }).ToList();
+      context.WorkoutDays.RemoveRange(existingDays);
+
+      foreach (var day in SelectedDays)
+      {
+        context.WorkoutDays.Add(new WorkoutDay
+        {
+          UserId = userId,
+          DayOfWeek = day
+        });
+      }
+
+      await context.SaveChangesAsync();
+      return RedirectToPage();
+    }
+
+    public class DayItem
+    {
+      public DayOfWeek Day { get; set; }
+      public bool IsSelected { get; set; }
+    }
   }
 }
