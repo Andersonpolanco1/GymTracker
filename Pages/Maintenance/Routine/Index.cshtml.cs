@@ -18,7 +18,8 @@ public class IndexModel(GymTrackerDbContext context) : PageModel
         .OrderBy(d => d.DayOfWeek)
         .ToListAsync();
 
-    Days = daysRaw.Select(d => new WorkoutDaySummaryVm
+    Days = daysRaw.Where(d=> d.IsActive)
+      .Select(d => new WorkoutDaySummaryVm
     {
       Id = d.Id,
       DayOfWeek = d.DayOfWeek,

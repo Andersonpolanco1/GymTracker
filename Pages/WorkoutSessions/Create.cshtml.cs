@@ -46,7 +46,7 @@ namespace GymTracker.Pages.WorkoutSessions
     // ================= GET =================
     public async Task<IActionResult> OnGetAsync(DateTime? date)
     {
-      SelectedDate = date ?? DateTime.Today;
+      SelectedDate = date ?? Utils.Utilities.NowRD();
       await LoadExercisesAsync(SelectedDate.Value);
       return Page();
     }

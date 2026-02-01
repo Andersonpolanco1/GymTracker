@@ -2,7 +2,15 @@
 @model GymTracker.Pages.Maintenance.Routine.IndexModel
 @using GymTracker.Enums
 
-<h2 class="mb-4">Días de Entrenamiento</h2>
+<h2 class="mb-1">Rutina Semanal</h2>
+<br />
+<div class="mb-4">
+    <a asp-page="/Maintenance/WorkoutDays/Index"
+       class="link-primary text-decoration-none">
+        ⚙️ Agregar/Eliminar días de entrenamiento
+    </a>
+</div>
+
 
 <table class="table table-hover shadow-sm">
     <thead class="table-dark">
@@ -16,7 +24,7 @@
         @foreach (var day in Model.Days)
         {
             <tr>
-                <td class="fw-bold">@day.DayOfWeek</td>
+                <td class="fw-bold">@Utils.Utilities.GetDayNameInSpanishCapitalized(day.DayOfWeek)</td>
 
                 <td>
                     @* Fuerza *@

@@ -7,6 +7,9 @@
 
     public string UserId { get; set; } = null!;
 
+    public bool IsActive { get; set; } = true;
+
+
     // Navegación
     public ApplicationUser User { get; set; } = null!;
     public ICollection<WorkoutDayExercise> Exercises { get; set; } = [];

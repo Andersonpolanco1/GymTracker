@@ -2,16 +2,31 @@
 @model GymTracker.Pages.LoginModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
-<h2>Login</h2>
-<form method="post">
+<div class="text-center mb-4">
+    <img src="~/img/logo.png"
+         alt="Gym Tracker Logo"
+         style="max-width: 180px;"
+         class="img-fluid" />
+</div>
+
+<h2 class="text-center mb-4">Login</h2>
+
+<form method="post" class="mx-auto" style="max-width: 400px;">
     <div class="mb-3">
         <label>Email</label>
         <input asp-for="Input.Email" class="form-control" />
     </div>
+
     <div class="mb-3">
         <label>Password</label>
         <input asp-for="Input.Password" type="password" class="form-control" />
     </div>
-    <button type="submit" class="btn btn-primary">Ingresar</button>
-    <span class="text-danger">@Model.ErrorMessage</span>
+
+    <button type="submit" class="btn btn-primary w-100">
+        Ingresar
+    </button>
+
+    <span class="text-danger d-block mt-2 text-center">
+        @Model.ErrorMessage
+    </span>
 </form>

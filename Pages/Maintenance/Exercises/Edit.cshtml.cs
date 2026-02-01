@@ -32,13 +32,29 @@ public class EditModel(GymTrackerDbContext context) : PageModel
 
   public async Task<IActionResult> OnPostAsync()
   {
+    if (Exercise is not null)
+    {
+      bool exists = await _context.Exercises
+        .AnyAsync(e => e.Name == Exercise.Name);
+            if (exists)
+            {
+              ModelState.AddModelError("Exercise.Name",
+                  "Ya existe un ejercicio con este nombre.");
+            }
+
+      if (Exercise.Type == ExerciseType.Strength && Exercise.MuscleId == null)
+      {
+        ModelState.AddModelError("Exercise.MuscleId",
+            "Debe seleccionar un músculo para ejercicios de fuerza.");
+      }
+    }
+
     if (!ModelState.IsValid)
     {
       LoadSelectLists();
       return Page();
     }
 
-    // Si es cardio, no debe tener músculo
     if (Exercise!.Type == ExerciseType.Cardio)
     {
       Exercise.MuscleId = null;

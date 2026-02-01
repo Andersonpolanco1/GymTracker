@@ -18,7 +18,7 @@ public class IndexModel(GymTrackerDbContext context) : PageModel
         .OrderBy(d => d.DayOfWeek)
         .ToListAsync();
 
-    Routine = days.Select(day => new WeeklyRoutineVm
+    Routine = days.Where(d => d.IsActive).Select(day => new WeeklyRoutineVm
     {
       DayOfWeek = day.DayOfWeek,
       DayName = Utils.Utilities.GetDayNameInSpanishCapitalized(day.DayOfWeek),

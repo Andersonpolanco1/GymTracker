@@ -7,9 +7,10 @@ namespace GymTracker.Pages
   public class IndexModel(GymTrackerDbContext context) : PageModel
   {
 
-    // Datos para la vista
     public DateTime Today { get; set; }
     public string DayName { get; set; } = string.Empty;
+    public bool HasWorkoutDay { get; set; } = true;
+    public bool HasExercises { get; set; }
 
     public List<string> Muscles { get; set; } = [];
     public List<ExerciseItem> Exercises { get; set; } = [];
@@ -18,22 +19,24 @@ namespace GymTracker.Pages
     public async Task OnGetAsync()
     {
       // Fecha actual
-      Today = DateTime.Today;
+      Today = Utils.Utilities.NowRD();
 
       // Nombre del día en español
       DayName = Utils.Utilities.GetDayNameInSpanishCapitalized(Today.DayOfWeek);
 
       // Buscar el WorkoutDay según el día actual
       var workoutDay = await context.WorkoutDays
-          //.Include(w => w.Muscles)
-          //    .ThenInclude(m => m.Muscle)
+        .Where(d => d.IsActive)
           .Include(w => w.Exercises)
               .ThenInclude(e => e.Exercise)
                   .ThenInclude(ex => ex.Muscle)
           .FirstOrDefaultAsync(w => w.DayOfWeek == Today.DayOfWeek);
 
       if (workoutDay == null)
+      {
+        HasWorkoutDay = false;
         return;
+      }
 
       // Músculos del día
       Muscles = workoutDay.Exercises
@@ -66,6 +69,8 @@ namespace GymTracker.Pages
             Minutes = 20 // valor por defecto o configurable
           })
           .ToList();
+
+      HasExercises = Exercises.Count != 0 || Cardio.Count != 0;
     }
 
     public class ExerciseItem

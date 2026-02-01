@@ -7,12 +7,20 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/GymTracker.styles.css" asp-append-version="true" />
+    <link rel="icon" type="image/x-icon" href="~/img/favico.ico" />
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand" asp-page="/Index">GymTracker</a>
+                <a class="navbar-brand d-flex align-items-center gap-2" asp-page="/Index">
+                    <img src="~/img/logo.png"
+                         alt="Gym Tracker Logo"
+                         width="32"
+                         height="32"
+                         class="d-inline-block align-text-top" />
+                    <span class="">Gym Tracker</span>
+                </a>
 
                 <button class="navbar-toggler" type="button"
                         data-bs-toggle="collapse"
@@ -67,7 +75,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2026 - GymTracker
+            &copy; 2026 - Gymc Tracker
         </div>
     </footer>
 

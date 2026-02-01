@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GymTracker.Migrations
 {
     [DbContext(typeof(GymTrackerDbContext))]
-    [Migration("20260131234238_Init")]
+    [Migration("20260201005613_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -552,6 +552,9 @@ namespace GymTracker.Migrations
 
                     b.Property<int>("DayOfWeek")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("UserId")
                         .IsRequired()

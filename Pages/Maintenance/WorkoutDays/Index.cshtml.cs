@@ -12,50 +12,65 @@ namespace GymTracker.Pages.Maintenance.WorkoutDays
   {
     public List<DayItem> Days { get; set; } = [];
 
-    [BindProperty]
-    public List<DayOfWeek> SelectedDays { get; set; } = [];
-
     public async Task OnGetAsync()
     {
       var userId = userManager.GetUserId(User)!;
 
-      var userDays = await context.WorkoutDays
-        .Where(x => x.UserId == userId)
+      var activeDays = await context.WorkoutDays
+        .Where(x => x.UserId == userId && x.IsActive)
         .Select(x => x.DayOfWeek)
         .ToListAsync();
 
       Days = Enum.GetValues<DayOfWeek>()
-        .Where(d => d != DayOfWeek.Sunday)
         .Select(d => new DayItem
         {
           Day = d,
-          IsSelected = userDays.Contains(d)
+          IsSelected = activeDays.Contains(d)
         })
         .ToList();
     }
 
-    public async Task<IActionResult> OnPostAsync()
+
+    public async Task<IActionResult> OnPostToggleAsync(DayOfWeek day)
     {
       var userId = userManager.GetUserId(User)!;
 
-      var existingDays = await context.WorkoutDays
-        .Where(x => x.UserId == userId)
-        .ToListAsync();
+      var existing = await context.WorkoutDays
+        .FirstOrDefaultAsync(x =>
+          x.UserId == userId &&
+          x.DayOfWeek == day);
 
-      context.WorkoutDays.RemoveRange(existingDays);
-
-      foreach (var day in SelectedDays)
+      if (existing is null)
       {
         context.WorkoutDays.Add(new WorkoutDay
         {
           UserId = userId,
-          DayOfWeek = day
+          DayOfWeek = day,
+          IsActive = true
         });
+      }
+      else
+      {
+        var wasActive = existing.IsActive;
+        existing.IsActive = !existing.IsActive;
+
+        if (wasActive && !existing.IsActive)
+        {
+          var dayExercises = await context.WorkoutDayExercises
+            .Where(we => we.WorkoutDayId == existing.Id)
+            .ToListAsync();
+
+          if (dayExercises.Count != 0)
+          {
+            context.WorkoutDayExercises.RemoveRange(dayExercises);
+          }
+        }
       }
 
       await context.SaveChangesAsync();
       return RedirectToPage();
     }
+
 
     public class DayItem
     {

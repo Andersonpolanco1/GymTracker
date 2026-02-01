@@ -4,29 +4,27 @@
     ViewData["Title"] = "Rutina semanal";
 }
 
-<h2 class="mb-4">Rutina semanal</h2>
+<h2 class="mb-4">Días de entrenamiento</h2>
 
-<form method="post">
-    <div class="row">
-        @foreach (var day in Model.Days)
-        {
-            <div class="col-md-4 mb-3">
-                <div class="form-check">
-                    <input class="form-check-input"
-                           type="checkbox"
-                           name="SelectedDays"
-                           value="@day.Day"
-                           checked="@day.IsSelected" />
+<div class="mb-4">
+    <a asp-page="/Maintenance/Routine/Index"
+       class="link-primary text-decoration-none">
+        ⚙️ Agregar/eliminar ejercicios a dias
+    </a>
+</div>
 
-                    <label class="form-check-label">
-                        @day.Day
-                    </label>
-                </div>
-            </div>
-        }
-    </div>
+<div class="row">
+    @foreach (var day in Model.Days)
+    {
+        <div class="col-md-4 mb-3">
+            <form method="post" asp-page-handler="Toggle">
+                <input type="hidden" name="Day" value="@day.Day" />
 
-    <button class="btn btn-primary mt-3">
-        Guardar rutina
-    </button>
-</form>
+                <button type="submit"
+                        class="btn w-100 @(day.IsSelected ? "btn-success" : "btn-outline-secondary")">
+                    @Utils.Utilities.GetDayNameInSpanishCapitalized(day.Day)
+                </button>
+            </form>
+        </div>
+    }
+</div>

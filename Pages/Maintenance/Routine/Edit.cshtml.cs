@@ -68,15 +68,24 @@ namespace GymTracker.Pages.Maintenance.WorkoutDays
 
     public async Task<IActionResult> OnPostAddExerciseAsync(int id)
     {
-      context.Add(new WorkoutDayExercise
-      {
-        WorkoutDayId = id,
-        ExerciseId = ExerciseId,
-        PlannedSets = PlannedSets,
-        PlannedReps = PlannedReps
-      });
+      if (!context.Set<WorkoutDayExercise>()
+          .Any(x => x.WorkoutDayId == id && x.ExerciseId == ExerciseId))
+      { 
+      
+        context.Add(new WorkoutDayExercise
+        {
+          WorkoutDayId = id,
+          ExerciseId = ExerciseId,
+          PlannedSets = PlannedSets,
+          PlannedReps = PlannedReps
+        });
 
-      await context.SaveChangesAsync();
+        await context.SaveChangesAsync();
+      
+      }
+
+
+
       return RedirectToPage(new { id });
     }
 
