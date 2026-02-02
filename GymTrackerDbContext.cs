@@ -15,10 +15,18 @@ namespace GymTracker
     public DbSet<ExerciseSet> ExerciseSets => Set<ExerciseSet>();
     public DbSet<CardioSession> CardioSessions => Set<CardioSession>();
     public DbSet<WorkoutDayExercise> WorkoutDayExercises => Set<WorkoutDayExercise>();
+    public DbSet<PerformedExercise> PerformedExercises => Set<PerformedExercise>();
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
       base.OnModelCreating(modelBuilder);
+
+      modelBuilder.Entity<PerformedExercise>()
+        .HasDiscriminator<string>("Discriminator")
+        .HasValue<StrengthSet>("Strength")
+        .HasValue<TimedExerciseSession>("Timed");
+
 
       // ============================================================
       // USER -> WORKOUT DAYS (CASCADE)
@@ -66,11 +74,11 @@ namespace GymTracker
       // ============================================================
       // DECIMAL CONFIGURATION (fix warnings)
       // ============================================================
-      modelBuilder.Entity<CardioSession>()
+      modelBuilder.Entity<TimedExerciseSession>()
         .Property(c => c.DistanceKm)
         .HasPrecision(6, 2);
 
-      modelBuilder.Entity<ExerciseSet>()
+      modelBuilder.Entity<StrengthSet>()
         .Property(e => e.Weight)
         .HasPrecision(6, 2);
 

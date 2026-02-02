@@ -11,8 +11,13 @@
     public int WorkoutDayId { get; set; }
     public WorkoutDay WorkoutDay { get; set; } = null!;
 
+    public ICollection<PerformedExercise> PerformedExercises { get; set; } = [];
+
+    // temporal
     public ICollection<ExerciseSet> Sets { get; set; } = [];
     public ICollection<CardioSession> CardioSessions { get; set; } = [];
+
+
   }
 
 }
