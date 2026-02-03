@@ -27,7 +27,7 @@ public class DetailsModel(GymTrackerDbContext ctx) : PageModel
 
   private void BuildAccordionItems()
   {
-    AccordionItems = Session.PerformedExercises
+    AccordionItems = [.. Session!.PerformedExercises
       .GroupBy(p => p.ExerciseId)
       .Select(group =>
       {
@@ -77,8 +77,7 @@ public class DetailsModel(GymTrackerDbContext ctx) : PageModel
 
         return item;
       })
-      .OrderBy(i => i.ExerciseName)
-      .ToList();
+      .OrderBy(i => i.ExerciseName)];
   }
 
   public class PerformedExerciseAccordionItem

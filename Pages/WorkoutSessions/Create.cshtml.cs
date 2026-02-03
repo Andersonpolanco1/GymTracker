@@ -63,28 +63,29 @@ namespace GymTracker.Pages.WorkoutSessions
               wd.DayOfWeek == SelectedDate.DayOfWeek &&
               wd.UserId == UserId);
 
-      var session = await GetOrCreateSessionAsync(SelectedDate);
+      var session = await GetSessionAsync(SelectedDate);
 
-      var performed = await context.PerformedExercises
-          .Include(p => p.Exercise)
-          .Where(p => p.WorkoutSessionId == session.Id)
-          .ToListAsync();
+      var performed = session == null
+        ? []
+        : await context.PerformedExercises
+            .Include(p => p.Exercise)
+            .Where(p => p.WorkoutSessionId == session.Id)
+            .ToListAsync();
+
 
       var routineExerciseIds = workoutDay.Exercises
           .Select(x => x.ExerciseId)
           .ToHashSet();
 
-      RoutineExercises = workoutDay.Exercises
+      RoutineExercises = [.. workoutDay.Exercises
           .Select(wde => BuildAccordionItem(wde.Exercise, performed))
-          .OrderBy(x => x.ExerciseName)
-          .ToList();
+          .OrderBy(x => x.ExerciseName)];
 
-      ExtraExercisesPerformed = performed
+      ExtraExercisesPerformed = [.. performed
           .Where(p => !routineExerciseIds.Contains(p.ExerciseId))
           .GroupBy(p => p.Exercise!)
           .Select(g => BuildAccordionItem(g.Key, performed))
-          .OrderBy(x => x.ExerciseName)
-          .ToList();
+          .OrderBy(x => x.ExerciseName)];
 
       ExtraExercises = await context.Exercises
           .Where(e => !routineExerciseIds.Contains(e.Id))
@@ -231,7 +232,8 @@ namespace GymTracker.Pages.WorkoutSessions
       {
         ExerciseId = exercise.Id,
         ExerciseName = exercise.Name,
-        Type = exercise.Type
+        Type = exercise.Type,
+        SelectedDate = SelectedDate
       };
 
       int order = 1;
@@ -264,6 +266,13 @@ namespace GymTracker.Pages.WorkoutSessions
 
       return vm;
     }
+
+    private async Task<WorkoutSession?> GetSessionAsync(DateOnly date)
+    {
+      return await context.WorkoutSessions
+        .FirstOrDefaultAsync(s => s.Date == date && s.UserId == UserId);
+    }
+
 
     private async Task<WorkoutSession> GetOrCreateSessionAsync(DateOnly date)
     {
@@ -306,6 +315,7 @@ namespace GymTracker.Pages.WorkoutSessions
     public string ExerciseName { get; set; } = "";
     public ExerciseType Type { get; set; }
     public List<ExerciseSetVm> Sets { get; set; } = [];
+    public DateOnly SelectedDate { get; set; } 
   }
 
   public class ExerciseSetVm

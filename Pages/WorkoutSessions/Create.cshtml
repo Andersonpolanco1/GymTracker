@@ -194,11 +194,11 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-        var allowedDays = @Html.Raw(Json.Serialize(Model.WorkoutDays));
+        var allowedDays = @Html.Raw(Json.Serialize(Model.WorkoutDays))
 
         flatpickr("#sessionDate", {
             dateFormat: "Y-m-d",
-            defaultDate: "@Model.SelectedDate.ToString("yyyy-MM-dd")",
+            defaultDate: '@Model.SelectedDate.ToString("yyyy-MM-dd")',
             disable: [
                 function (date) {
                     return !allowedDays.includes(date.getDay());
