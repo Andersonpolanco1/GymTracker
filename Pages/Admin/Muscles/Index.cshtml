@@ -14,7 +14,7 @@
     </span>
 
     <a asp-page="Create" class="btn btn-primary">
-        + Nuevo músculo
+        ➕ Nuevo músculo
     </a>
 </div>
 
@@ -31,12 +31,26 @@
             <tr>
                 <td>@m.Name</td>
                 <td class="text-end">
-                    <a asp-page="EditMuscle" asp-route-id="@m.Id" class="btn btn-sm btn-warning">Editar</a>
-                    <form method="post" asp-page-handler="Delete" asp-route-id="@m.Id" class="d-inline">
-                        <button class="btn btn-sm btn-danger">Eliminar</button>
+
+                    <a asp-page="EditMuscle"
+                       asp-route-id="@m.Id"
+                       class="text-decoration-none text-secondary me-2">
+                        Editar
+                    </a>
+
+                    <form method="post"
+                          asp-page-handler="Delete"
+                          asp-route-id="@m.Id"
+                          class="d-inline">
+                        <button type="submit"
+                                class="btn btn-link p-0 text-danger">
+                            Eliminar
+                        </button>
                     </form>
+
                 </td>
             </tr>
         }
     </tbody>
+
 </table>

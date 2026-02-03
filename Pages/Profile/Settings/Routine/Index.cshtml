@@ -1,0 +1,129 @@
+﻿@page
+@model GymTracker.Pages.Maintenance.Routine.IndexModel
+@using GymTracker.Enums
+
+@{
+    ViewData["Title"] = "Editar Rutina";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-page="/Profile/Settings/Index">Configuración</a>
+        </li>
+        <li class="breadcrumb-item active">
+            Rutina
+        </li>
+    </ol>
+</nav>
+
+<h2 class="mb-1">Rutina Semanal</h2>
+<br />
+<div class="mb-4">
+    <a asp-page="/Profile/Settings/WorkoutDays/Index"
+       class="link-primary text-decoration-none">
+        ⚙️ Agregar/Eliminar días de entrenamiento
+    </a>
+</div>
+
+@if (Model.Days == null || !Model.Days.Any())
+{
+    <div class="alert alert-warning text-center">
+        <h5 class="mb-1">No hay días de entrenamiento habilitados</h5>
+        <p class="mb-0 text-muted">
+            Debes habilitar al menos un día de entrenamiento para configurar tu rutina.
+        </p>
+
+        <a asp-page="/Maintenance/WorkoutDays/Index"
+           class="btn btn-warning mt-3">
+            Configurar días de entrenamiento
+        </a>
+    </div>
+}
+else
+{
+    <table class="table table-hover shadow-sm">
+        <thead class="table-light">
+            <tr>
+                <th style="width:140px">Día</th>
+                <th>Ejercicios</th>
+                <th class="text-end" style="width:160px">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var day in Model.Days)
+            {
+                <tr>
+                    <td class="fw-bold">
+                        @Utils.Utilities.GetDayNameInSpanishCapitalized(day.DayOfWeek)
+                    </td>
+
+                    <td>
+                        @* Fuerza *@
+                        @if (day.MuscleGroups.Any())
+                        {
+                            foreach (var mg in day.MuscleGroups)
+                            {
+                                <div class="mb-1">
+                                    <strong>@mg.MuscleName</strong>
+                                    <ul class="mb-1">
+                                        @foreach (var e in mg.Exercises)
+                                        {
+                                            <li>
+                                                @e.Name
+                                                <span class="text-muted">
+                                                    (@e.Sets x
+                                                    @(e.Reps.HasValue
+                                                        ? e.Reps.ToString()
+                                                        : e.DurationsSeconds.HasValue
+                                                        ? $"{e.DurationsSeconds} segundos"
+                                                        : "")
+                                                    )
+                                                </span>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                        }
+
+                        @* Cardio *@
+                        @if (day.CardioExercises.Any())
+                        {
+                            <div class="mt-2">
+                                <strong>Cardio</strong>
+                                <ul class="mb-0">
+                                    @foreach (var c in day.CardioExercises)
+                                    {
+                                        <li>
+                                            @c.Name
+                                            @if (c.PlannedDurationSeconds.HasValue)
+                                            {
+                                                <span class="text-muted">
+                                                    (@(c.PlannedDurationSeconds.Value / 60) min)
+                                                </span>
+                                            }
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+
+                        @if (!day.MuscleGroups.Any() && !day.CardioExercises.Any())
+                        {
+                            <span class="text-muted">Sin ejercicios</span>
+                        }
+                    </td>
+
+                    <td class="text-end">
+                        <a asp-page="Edit"
+                           asp-route-id="@day.Id"
+                           class="btn btn-sm btn-outline-primary">
+                            Configurar
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

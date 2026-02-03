@@ -14,7 +14,7 @@
     </span>
 
     <a asp-page="Create" class="btn btn-primary">
-        + Nuevo ejercicio
+        ➕ Nuevo ejercicio
     </a>
 </div>
 
@@ -57,11 +57,13 @@
                 </td>
 
                 <td class="text-end">
-                    <a asp-page="Edit" asp-route-id="@exercise.Id"
-                       class="btn btn-sm btn-outline-warning">
+                    <a asp-page="Edit"
+                       asp-route-id="@exercise.Id"
+                       class="text-decoration-none text-secondary">
                         Editar
                     </a>
                 </td>
+
             </tr>
         }
     </tbody>

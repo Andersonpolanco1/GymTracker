@@ -1,0 +1,64 @@
+﻿@page
+@model GymTracker.Pages.Maintenance.Cardio.IndexModel
+@{
+    ViewData["Title"] = "Mantenimiento de Cardio";
+}
+
+<h2 class="mb-3">Mantenimiento de Cardio</h2>
+
+<div class="mb-3 d-flex justify-content-between align-items-center">
+    <span class="text-muted">
+        Total: @Model.CardioExercises.Count ejercicios
+    </span>
+
+    <a asp-page="./Create"
+       class="btn btn-primary">
+        ➕ Nuevo cardio
+    </a>
+</div>
+
+<table class="table table-striped table-hover shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th style="width:80px">Id</th>
+            <th>Nombre del ejercicio</th>
+            <th class="text-end" style="width:160px">Acciones</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if (Model.CardioExercises.Any())
+        {
+            @foreach (var c in Model.CardioExercises)
+            {
+                <tr>
+                    <td>@c.Id</td>
+                    <td>@c.Name</td>
+                    <td class="text-end">
+
+                        <a asp-page="./Edit"
+                           asp-route-id="@c.Id"
+                           class="text-decoration-none text-secondary me-2">
+                            Editar
+                        </a>
+
+                        <a asp-page="./Delete"
+                           asp-route-id="@c.Id"
+                           class="text-decoration-none text-danger">
+                            Eliminar
+                        </a>
+
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="3" class="text-center text-muted">
+                    No hay ejercicios de cardio registrados
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

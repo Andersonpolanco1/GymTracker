@@ -201,7 +201,8 @@ namespace GymTracker.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    MuscleId = table.Column<int>(type: "int", nullable: true)
+                    MuscleId = table.Column<int>(type: "int", nullable: true),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -219,7 +220,8 @@ namespace GymTracker.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Date = table.Column<DateOnly>(type: "date", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     WorkoutDayId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -249,7 +251,8 @@ namespace GymTracker.Migrations
                     WorkoutDayId = table.Column<int>(type: "int", nullable: false),
                     ExerciseId = table.Column<int>(type: "int", nullable: false),
                     PlannedSets = table.Column<int>(type: "int", nullable: false),
-                    PlannedReps = table.Column<int>(type: "int", nullable: false)
+                    PlannedReps = table.Column<int>(type: "int", nullable: true),
+                    PlannedDurationSeconds = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -269,60 +272,36 @@ namespace GymTracker.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CardioSessions",
+                name: "PerformedExercises",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     WorkoutSessionId = table.Column<int>(type: "int", nullable: false),
                     ExerciseId = table.Column<int>(type: "int", nullable: false),
-                    DurationMinutes = table.Column<int>(type: "int", nullable: false),
+                    Order = table.Column<int>(type: "int", nullable: false),
+                    Discriminator = table.Column<string>(type: "nvarchar(21)", maxLength: 21, nullable: false),
+                    Reps = table.Column<int>(type: "int", nullable: true),
+                    Weight = table.Column<decimal>(type: "decimal(6,2)", precision: 6, scale: 2, nullable: true),
+                    RIR = table.Column<int>(type: "int", nullable: true),
+                    RestSeconds = table.Column<int>(type: "int", nullable: true),
+                    Duration = table.Column<TimeSpan>(type: "time", nullable: true),
+                    TimedSet_Duration = table.Column<TimeSpan>(type: "time", nullable: true),
                     DistanceKm = table.Column<decimal>(type: "decimal(6,2)", precision: 6, scale: 2, nullable: true),
                     Calories = table.Column<int>(type: "int", nullable: true),
                     AvgHeartRate = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CardioSessions", x => x.Id);
+                    table.PrimaryKey("PK_PerformedExercises", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CardioSessions_Exercises_ExerciseId",
+                        name: "FK_PerformedExercises_Exercises_ExerciseId",
                         column: x => x.ExerciseId,
                         principalTable: "Exercises",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CardioSessions_WorkoutSessions_WorkoutSessionId",
-                        column: x => x.WorkoutSessionId,
-                        principalTable: "WorkoutSessions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ExerciseSets",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    WorkoutSessionId = table.Column<int>(type: "int", nullable: false),
-                    ExerciseId = table.Column<int>(type: "int", nullable: false),
-                    SetNumber = table.Column<int>(type: "int", nullable: false),
-                    Reps = table.Column<int>(type: "int", nullable: false),
-                    Weight = table.Column<decimal>(type: "decimal(6,2)", precision: 6, scale: 2, nullable: false),
-                    RIR = table.Column<int>(type: "int", nullable: true),
-                    RestSeconds = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ExerciseSets", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ExerciseSets_Exercises_ExerciseId",
-                        column: x => x.ExerciseId,
-                        principalTable: "Exercises",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ExerciseSets_WorkoutSessions_WorkoutSessionId",
+                        name: "FK_PerformedExercises_WorkoutSessions_WorkoutSessionId",
                         column: x => x.WorkoutSessionId,
                         principalTable: "WorkoutSessions",
                         principalColumn: "Id",
@@ -331,11 +310,11 @@ namespace GymTracker.Migrations
 
             migrationBuilder.InsertData(
                 table: "Exercises",
-                columns: new[] { "Id", "MuscleId", "Name", "Type" },
+                columns: new[] { "Id", "MuscleId", "Name", "Notes", "Type" },
                 values: new object[,]
                 {
-                    { 100, null, "Caminadora", 2 },
-                    { 101, null, "Escalera Mecanica", 2 }
+                    { 100, null, "Caminadora", "Mantén postura erguida y ritmo constante.", 2 },
+                    { 101, null, "Escalera Mecánica", "Apoya todo el pie y controla la respiración.", 2 }
                 });
 
             migrationBuilder.InsertData(
@@ -354,49 +333,49 @@ namespace GymTracker.Migrations
 
             migrationBuilder.InsertData(
                 table: "Exercises",
-                columns: new[] { "Id", "MuscleId", "Name", "Type" },
+                columns: new[] { "Id", "MuscleId", "Name", "Notes", "Type" },
                 values: new object[,]
                 {
-                    { 1, 1, "Peso muerto (espalda baja)", 1 },
-                    { 2, 1, "Dominadas pronas", 1 },
-                    { 3, 1, "Remo con barra", 1 },
-                    { 4, 1, "Jalón al pecho agarre neutro", 1 },
-                    { 5, 1, "Remo en polea baja", 1 },
-                    { 6, 1, "Remo pecho apoyado en máquina", 1 },
-                    { 10, 2, "Curl con barra", 1 },
-                    { 11, 2, "Curl en banco inclinado", 1 },
-                    { 12, 2, "Curl en polea baja", 1 },
-                    { 13, 2, "Predicador", 1 },
-                    { 14, 2, "Curl martillo", 1 },
-                    { 20, 3, "Prensa de piernas", 1 },
-                    { 21, 3, "Zancadas caminando", 1 },
-                    { 22, 3, "Extensiones de piernas", 1 },
-                    { 23, 3, "Elevaciones de talones de pie", 1 },
-                    { 24, 3, "Hack squat", 1 },
-                    { 25, 3, "Curl femoral sentado", 1 },
-                    { 26, 3, "Curl femoral acostado", 1 },
-                    { 27, 3, "Gemelos en prensa", 1 },
-                    { 30, 4, "Press militar con barra", 1 },
-                    { 31, 4, "Face pull", 1 },
-                    { 32, 4, "Arnold press", 1 },
-                    { 33, 4, "Elevaciones laterales en polea", 1 },
-                    { 34, 4, "Elevaciones posteriores en máquina", 1 },
-                    { 40, 5, "Press inclinado con mancuernas", 1 },
-                    { 41, 5, "Press plano con barra", 1 },
-                    { 42, 5, "Fondos en paralelas (pecho)", 1 },
-                    { 43, 5, "Press inclinado en máquina", 1 },
-                    { 44, 5, "Aperturas con mancuernas", 1 },
-                    { 45, 5, "Cruce unilateral en polea", 1 },
-                    { 50, 6, "Press cerrado con barra", 1 },
-                    { 51, 6, "Extensión por encima de la cabeza en polea con barra", 1 },
-                    { 52, 6, "Extensión en polea con cuerda", 1 },
-                    { 53, 6, "Rompecráneos", 1 },
-                    { 60, 7, "Elevaciones de piernas colgado", 1 },
-                    { 61, 7, "Plancha", 1 },
-                    { 62, 7, "Ab wheel", 1 },
-                    { 63, 7, "Crunch declinado", 1 },
-                    { 64, 7, "Russian twist", 1 },
-                    { 65, 7, "Plancha lateral", 1 }
+                    { 1, 1, "Peso muerto (espalda baja)", "Mantén la espalda neutra y activa el core durante todo el movimiento.", 1 },
+                    { 2, 1, "Dominadas pronas", "Inicia el movimiento con la espalda, no con los brazos.", 1 },
+                    { 3, 1, "Remo con barra", "Evita balancearte y lleva la barra hacia el ombligo.", 1 },
+                    { 4, 1, "Jalón al pecho agarre neutro", "Aprieta los omóplatos al bajar y controla la subida.", 1 },
+                    { 5, 1, "Remo en polea baja", "Espalda recta y pausa breve al final del tirón.", 1 },
+                    { 6, 1, "Remo pecho apoyado en máquina", "Concéntrate en la contracción sin usar impulso.", 1 },
+                    { 10, 2, "Curl con barra", "Codos pegados al cuerpo y movimiento controlado.", 1 },
+                    { 11, 2, "Curl en banco inclinado", "Extiende bien los brazos antes de subir el peso.", 1 },
+                    { 12, 2, "Curl en polea baja", "Mantén tensión constante durante todo el recorrido.", 1 },
+                    { 13, 2, "Predicador", "Evita bloquear los codos al estirar.", 1 },
+                    { 14, 2, "Curl martillo", "Controla la bajada para mayor activación.", 1 },
+                    { 20, 3, "Prensa de piernas", "No bloquees las rodillas al extender.", 1 },
+                    { 21, 3, "Zancadas caminando", "Paso largo y torso erguido.", 1 },
+                    { 22, 3, "Extensiones de piernas", "Sube controlado y aprieta el cuádriceps arriba.", 1 },
+                    { 23, 3, "Elevaciones de talones de pie", "Pausa breve arriba para activar gemelos.", 1 },
+                    { 24, 3, "Hack squat", "Apoya bien la espalda y controla la bajada.", 1 },
+                    { 25, 3, "Curl femoral sentado", "Evita impulsarte con la cadera.", 1 },
+                    { 26, 3, "Curl femoral acostado", "Controla la bajada del peso.", 1 },
+                    { 27, 3, "Gemelos en prensa", "Recorrido completo, baja bien el talón.", 1 },
+                    { 30, 4, "Press militar con barra", "Aprieta el core y evita arquear la espalda.", 1 },
+                    { 31, 4, "Face pull", "Lleva la cuerda hacia la cara separando las manos.", 1 },
+                    { 32, 4, "Arnold press", "Movimiento fluido sin bloquear codos.", 1 },
+                    { 33, 4, "Elevaciones laterales en polea", "Sube hasta la altura del hombro, no más.", 1 },
+                    { 34, 4, "Elevaciones posteriores en máquina", "Concéntrate en deltoide posterior, no en los brazos.", 1 },
+                    { 40, 5, "Press inclinado con mancuernas", "Baja controlado y empuja sin juntar mancuernas.", 1 },
+                    { 41, 5, "Press plano con barra", "Pies firmes y escápulas retraídas.", 1 },
+                    { 42, 5, "Fondos en paralelas (pecho)", "Inclina ligeramente el torso hacia adelante.", 1 },
+                    { 43, 5, "Press inclinado en máquina", "Controla el recorrido completo.", 1 },
+                    { 44, 5, "Aperturas con mancuernas", "Mantén codos semiflexionados.", 1 },
+                    { 45, 5, "Cruce unilateral en polea", "Aprieta el pecho al cruzar.", 1 },
+                    { 50, 6, "Press cerrado con barra", "Codos cerca del cuerpo.", 1 },
+                    { 51, 6, "Extensión por encima de la cabeza en polea con barra", "Mantén brazos fijos durante el movimiento.", 1 },
+                    { 52, 6, "Extensión en polea con cuerda", "Separa la cuerda al final.", 1 },
+                    { 53, 6, "Rompecráneos", "Baja el peso hacia la frente controladamente.", 1 },
+                    { 60, 7, "Elevaciones de piernas colgado", "Evita balancearte.", 1 },
+                    { 61, 7, "Plancha", "Cuerpo alineado y abdomen firme.", 1 },
+                    { 62, 7, "Ab wheel", "Mantén la cadera estable.", 1 },
+                    { 63, 7, "Crunch declinado", "Sube controlado sin tirar del cuello.", 1 },
+                    { 64, 7, "Russian twist", "Rota el torso, no solo los brazos.", 1 },
+                    { 65, 7, "Plancha lateral", "Mantén cadera elevada.", 1 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -439,28 +418,18 @@ namespace GymTracker.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CardioSessions_ExerciseId",
-                table: "CardioSessions",
-                column: "ExerciseId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CardioSessions_WorkoutSessionId",
-                table: "CardioSessions",
-                column: "WorkoutSessionId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Exercises_MuscleId",
                 table: "Exercises",
                 column: "MuscleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExerciseSets_ExerciseId",
-                table: "ExerciseSets",
+                name: "IX_PerformedExercises_ExerciseId",
+                table: "PerformedExercises",
                 column: "ExerciseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExerciseSets_WorkoutSessionId",
-                table: "ExerciseSets",
+                name: "IX_PerformedExercises_WorkoutSessionId",
+                table: "PerformedExercises",
                 column: "WorkoutSessionId");
 
             migrationBuilder.CreateIndex(
@@ -508,10 +477,7 @@ namespace GymTracker.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "CardioSessions");
-
-            migrationBuilder.DropTable(
-                name: "ExerciseSets");
+                name: "PerformedExercises");
 
             migrationBuilder.DropTable(
                 name: "WorkoutDayExercises");

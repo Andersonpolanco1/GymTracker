@@ -1,0 +1,64 @@
+﻿@model GymTracker.Pages.WorkoutSessions.ExerciseAccordionItemVm
+
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th>Serie</th>
+
+            @if (Model.Type == GymTracker.Enums.ExerciseType.Strength)
+            {
+                <th>Reps</th>
+                <th>Peso</th>
+                <th>Volumen</th>
+                <th>Duración</th>
+            }
+            else
+            {
+                <th>Duración</th>
+                <th>Distancia</th>
+                <th>Calorías</th>
+            }
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var s in Model.Sets)
+        {
+            <tr>
+                <td>@s.Order</td>
+
+                @if (Model.Type == GymTracker.Enums.ExerciseType.Strength)
+                {
+                    <td>@s.Reps</td>
+                    <td>@s.Weight</td>
+                    <td>@s.Volume</td>
+                    <td>@s.DurationMinutes</td>
+                }
+                else
+                {
+                    <td>@s.DurationMinutes</td>
+                    <td>@s.DistanceKm</td>
+                    <td>@s.Calories</td>
+                }
+
+                <td>
+                    <form method="post" asp-page-handler="Remove">
+                        <input type="hidden" name="id" value="@s.Id" />
+                        <input type="hidden" name="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                        <button class="btn btn-sm btn-outline-danger">✕</button>
+                    </form>
+                </td>
+            </tr>
+        }
+
+        @if (!Model.Sets.Any())
+        {
+            <tr>
+                <td colspan="6" class="text-muted text-center">
+                    No hay series registradas
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

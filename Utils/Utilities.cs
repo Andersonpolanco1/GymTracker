@@ -70,6 +70,11 @@ namespace GymTracker.Utils
       return date.ToString("dd/MM/yyyy", SpanishCulture);
     }
 
+    public static string GetLocalDateFormat(DateOnly date)
+    {
+      return date.ToString("dd/MM/yyyy", SpanishCulture);
+    }
+
     public static string GetTodayLocalDateFormat()
     {
       return GetLocalDateFormat(NowRD());

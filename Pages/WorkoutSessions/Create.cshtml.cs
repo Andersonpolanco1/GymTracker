@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace GymTracker.Pages.WorkoutSessions
 {
@@ -11,224 +12,317 @@ namespace GymTracker.Pages.WorkoutSessions
       GymTrackerDbContext context,
       UserManager<ApplicationUser> userManager) : PageModel
   {
-
     private string UserId => userManager.GetUserId(User)!;
 
-    public WorkoutSession? Session { get; set; }
+    public DateOnly SelectedDate { get; set; }
+    public bool IsToday { get; set; }
+    public string DayName { get; set; } = "";
 
-    // Ejercicios
-    public List<Exercise> StrengthRoutineExercises { get; set; } = [];
-    public List<Exercise> StrengthOtherExercises { get; set; } = [];
-    public List<Exercise> CardioRoutineExercises { get; set; } = [];
-    public List<Exercise> CardioOtherExercises { get; set; } = [];
-
-    // Series
-    public List<ExerciseSet> Sets { get; set; } = [];
-    public List<CardioSession> CardioSessions { get; set; } = [];
-
-    // Inputs fuerza
-    [BindProperty] public int SelectedStrengthId { get; set; }
-    [BindProperty] public int? Reps { get; set; }
-    [BindProperty] public decimal? Weight { get; set; }
-
-    // Inputs cardio
-    [BindProperty] public int SelectedCardioId { get; set; }
-    [BindProperty] public int? DurationMinutes { get; set; }
-    [BindProperty] public decimal? DistanceKm { get; set; }
-    [BindProperty] public int? Calories { get; set; }
-    [BindProperty] public int? AvgHeartRate { get; set; }
-
-    [BindProperty] public string ActiveTab { get; set; } = "strength";
-
-    // Fecha seleccionada
-    [BindProperty] public DateTime? SelectedDate { get; set; }
-    public List<int> WorkoutDays { get; set; } = []; 
+    public List<int> WorkoutDays { get; set; } = [];
+    public List<ExerciseAccordionItemVm> RoutineExercises { get; set; } = [];
+    public List<ExerciseAccordionItemVm> ExtraExercisesPerformed { get; set; } = [];
+    public List<Exercise> ExtraExercises { get; set; } = [];
 
 
-    // ================= GET =================
+    // ============================
+    // GET
+    // ============================
     public async Task<IActionResult> OnGetAsync(DateTime? date)
     {
-      SelectedDate = date ?? Utils.Utilities.NowRD();
-      await LoadExercisesAsync(SelectedDate.Value);
-      await LoadActiveWorkoutDays();
+      var selectedDateTime = date ?? Utils.Utilities.TodayRD();
+      var dateOnly = DateOnly.FromDateTime(selectedDateTime);
+
+      await LoadPageAsync(dateOnly);
+
       return Page();
     }
 
-    private async Task LoadActiveWorkoutDays()
-    {
-      WorkoutDays = await context.WorkoutDays
-      .Where(d => d.IsActive && d.UserId == UserId)
-      .Select(d => (int)d.DayOfWeek)
-      .ToListAsync();
-    }
 
-    // ================= CARGA GENERAL =================
-    private async Task LoadExercisesAsync(DateTime date)
+    private async Task LoadPageAsync(DateOnly date)
     {
-      var dayOfWeek = date.DayOfWeek;
+      SelectedDate = date;
+
+      IsToday = SelectedDate == DateOnly.FromDateTime(Utils.Utilities.TodayRD());
+      DayName = Utils.Utilities.GetDayNameInSpanish(SelectedDate.DayOfWeek);
+
+      await LoadActiveWorkoutDaysAsync();
+
+      if (!WorkoutDays.Contains((int)SelectedDate.DayOfWeek))
+      {
+        ModelState.AddModelError(
+            "SelectedDate",
+            $"El día {DayName} no está habilitado."
+        );
+        return;
+      }
 
       var workoutDay = await context.WorkoutDays
-        .Where(d => d.IsActive)
-          .Include(d => d.Exercises)
-              .ThenInclude(de => de.Exercise)
-          .FirstOrDefaultAsync(d => d.DayOfWeek == dayOfWeek);
+          .Include(wd => wd.Exercises)
+              .ThenInclude(wde => wde.Exercise)
+          .FirstAsync(wd =>
+              wd.DayOfWeek == SelectedDate.DayOfWeek &&
+              wd.UserId == UserId);
 
-      if (workoutDay == null) return;
+      var session = await GetOrCreateSessionAsync(SelectedDate);
 
-      var routineIds = workoutDay.Exercises.Select(e => e.ExerciseId).ToList();
-
-      StrengthRoutineExercises = workoutDay.Exercises
-          .Where(e => e.Exercise.Type == ExerciseType.Strength)
-          .Select(e => e.Exercise)
-          .OrderBy(e => e.Name)
-          .ToList();
-
-      StrengthOtherExercises = await context.Exercises
-          .Where(e => e.Type == ExerciseType.Strength && !routineIds.Contains(e.Id))
-          .OrderBy(e => e.Name)
+      var performed = await context.PerformedExercises
+          .Include(p => p.Exercise)
+          .Where(p => p.WorkoutSessionId == session.Id)
           .ToListAsync();
 
-      CardioRoutineExercises = workoutDay.Exercises
-          .Where(e => e.Exercise.Type == ExerciseType.Cardio)
-          .Select(e => e.Exercise)
-          .OrderBy(e => e.Name)
+      var routineExerciseIds = workoutDay.Exercises
+          .Select(x => x.ExerciseId)
+          .ToHashSet();
+
+      RoutineExercises = workoutDay.Exercises
+          .Select(wde => BuildAccordionItem(wde.Exercise, performed))
+          .OrderBy(x => x.ExerciseName)
           .ToList();
 
-      CardioOtherExercises = await context.Exercises
-          .Where(e => e.Type == ExerciseType.Cardio && !routineIds.Contains(e.Id))
+      ExtraExercisesPerformed = performed
+          .Where(p => !routineExerciseIds.Contains(p.ExerciseId))
+          .GroupBy(p => p.Exercise!)
+          .Select(g => BuildAccordionItem(g.Key, performed))
+          .OrderBy(x => x.ExerciseName)
+          .ToList();
+
+      ExtraExercises = await context.Exercises
+          .Where(e => !routineExerciseIds.Contains(e.Id))
           .OrderBy(e => e.Name)
           .ToListAsync();
-
-      //  Cargar sesión SOLO del usuario
-      Session = await context.WorkoutSessions
-          .Include(s => s.Sets)
-              .ThenInclude(es => es.Exercise)
-          .Include(s => s.CardioSessions)
-              .ThenInclude(cs => cs.Exercise)
-          .FirstOrDefaultAsync(s =>
-              s.Date == date &&
-              s.UserId == UserId);
-
-      Sets = Session?.Sets.ToList() ?? [];
-      CardioSessions = Session?.CardioSessions.ToList() ?? [];
     }
 
-    // ================= FUERZA =================
-    public async Task<IActionResult> OnPostAddStrengthAsync()
+    // ============================
+    // ADD SET
+    // ============================
+    public async Task<IActionResult> OnPostAddSetAsync(
+        int exerciseId,
+        DateOnly date,
+        int? reps,
+        decimal? weight,
+        int? durationMinutes,
+        decimal? distanceKm,
+        int? calories)
     {
-      if (SelectedStrengthId == 0)
-        ModelState.AddModelError(nameof(SelectedStrengthId), "Debes seleccionar un ejercicio");
+      var session = await GetOrCreateSessionAsync(date);
+      var exercise = await context.Exercises.FindAsync(exerciseId);
 
-      if (Reps is null || Reps <= 0)
-        ModelState.AddModelError(nameof(Reps), "Debes indicar las repeticiones");
+      if (exercise == null)
+      {
+        ModelState.AddModelError("", "Ejercicio no encontrado");
+        await LoadPageAsync(date);
+        return Page();
+      }
 
-      if (Weight is null || Weight <= 0)
-        ModelState.AddModelError(nameof(Weight), "Debes indicar el peso");
+      // ============================
+      // VALIDATIONS
+      // ============================
+      if (exercise.Type == ExerciseType.Strength)
+      {
+        ValidateStrengthSet(reps, weight, durationMinutes);
+      }
+      else
+      {
+        ValidateTimedSet(durationMinutes);
+      }
 
       if (!ModelState.IsValid)
-        return await OnGetAsync(SelectedDate);
-
-      var session = await GetOrCreateSessionAsync(SelectedDate ?? Utils.Utilities.TodayRD());
-
-      int lastSetNumber = await context.ExerciseSets
-          .Where(s => s.WorkoutSessionId == session.Id && s.ExerciseId == SelectedStrengthId)
-          .Select(s => (int?)s.SetNumber)
-          .MaxAsync() ?? 0;
-
-      context.ExerciseSets.Add(new ExerciseSet
       {
-        WorkoutSessionId = session.Id,
-        ExerciseId = SelectedStrengthId,
-        SetNumber = lastSetNumber + 1,
-        Reps = Reps!.Value,
-        Weight = Weight!.Value
-      });
+        await LoadPageAsync(date);
+        return Page();
+      }
+
+      // ============================
+      // SAVE
+      // ============================
+      if (exercise.Type == ExerciseType.Strength)
+      {
+        context.PerformedExercises.Add(new StrengthSet
+        {
+          WorkoutSessionId = session.Id,
+          ExerciseId = exerciseId,
+          Reps = reps!.Value,
+          Weight = weight ?? 0,
+          Duration = durationMinutes.HasValue
+                ? TimeSpan.FromMinutes(durationMinutes.Value)
+                : null
+        });
+      }
+      else
+      {
+        context.PerformedExercises.Add(new TimedSet
+        {
+          WorkoutSessionId = session.Id,
+          ExerciseId = exerciseId,
+          Duration = TimeSpan.FromMinutes(durationMinutes!.Value),
+          DistanceKm = distanceKm,
+          Calories = calories
+        });
+      }
 
       await context.SaveChangesAsync();
-
-      return RedirectToPage(new { date = SelectedDate?.ToString("yyyy-MM-dd") });
+      return RedirectToPage(new { date });
     }
 
-    // ================= CARDIO =================
-    public async Task<IActionResult> OnPostAddCardioAsync()
+    private void ValidateStrengthSet(
+    int? reps,
+    decimal? weight,
+    int? durationMinutes)
     {
-      if (SelectedCardioId == 0)
-        ModelState.AddModelError(nameof(SelectedCardioId), "Debes seleccionar un ejercicio");
-
-      if (DurationMinutes is null || DurationMinutes <= 0)
-        ModelState.AddModelError(nameof(DurationMinutes), "Debes indicar la duración");
-
-      if (!ModelState.IsValid)
-        return await OnGetAsync(SelectedDate);
-
-      var session = await GetOrCreateSessionAsync(SelectedDate ?? DateTime.Today);
-
-      context.CardioSessions.Add(new CardioSession
+      if (!reps.HasValue || reps <= 0)
       {
-        WorkoutSessionId = session.Id,
-        ExerciseId = SelectedCardioId,
-        DurationMinutes = DurationMinutes!.Value,
-        DistanceKm = DistanceKm,
-        Calories = Calories,
-        AvgHeartRate = AvgHeartRate
-      });
+        ModelState.AddModelError(
+            nameof(reps),
+            "Las repeticiones son obligatorias para ejercicios de fuerza"
+        );
+        return;
+      }
 
-      await context.SaveChangesAsync();
+      var hasWeight = weight.HasValue && weight > 0;
+      var hasDuration = durationMinutes.HasValue && durationMinutes > 0;
 
-      return RedirectToPage(new { date = SelectedDate?.ToString("yyyy-MM-dd") });
+      if (!hasWeight && !hasDuration)
+      {
+        ModelState.AddModelError(
+            "",
+            "Debes indicar peso o duración para ejercicios de fuerza"
+        );
+
+        return;
+      }
     }
 
-    // ================= REMOVE =================
-    public async Task<IActionResult> OnPostRemoveStrengthAsync(int id)
+    private void ValidateTimedSet(int? durationMinutes)
     {
-      var set = await context.ExerciseSets.FindAsync(id);
+      if (!durationMinutes.HasValue || durationMinutes <= 0)
+      {
+        ModelState.AddModelError(
+            nameof(durationMinutes),
+            "La duración es obligatoria para este tipo de ejercicio"
+        );
+      }
+    }
+
+
+
+    // ============================
+    // REMOVE SET
+    // ============================
+    public async Task<IActionResult> OnPostRemoveAsync(int id, DateTime date)
+    {
+      var set = await context.PerformedExercises.FindAsync(id);
       if (set != null)
       {
-        context.ExerciseSets.Remove(set);
+        context.PerformedExercises.Remove(set);
         await context.SaveChangesAsync();
       }
 
-      return RedirectToPage(new { date = SelectedDate?.ToString("yyyy-MM-dd") });
+      return RedirectToPage(new { date });
     }
 
-    public async Task<IActionResult> OnPostRemoveCardioAsync(int id)
+    // ============================
+    // HELPERS
+    // ============================
+    private ExerciseAccordionItemVm BuildAccordionItem(
+      Exercise exercise,
+      List<PerformedExercise> performed)
     {
-      var cardio = await context.CardioSessions.FindAsync(id);
-      if (cardio != null)
+      var vm = new ExerciseAccordionItemVm
       {
-        context.CardioSessions.Remove(cardio);
-        await context.SaveChangesAsync();
-      }
+        ExerciseId = exercise.Id,
+        ExerciseName = exercise.Name,
+        Type = exercise.Type
+      };
 
-      return RedirectToPage(new { date = SelectedDate?.ToString("yyyy-MM-dd") });
-    }
+      int order = 1;
 
-    // ================= SESIÓN =================
-    private async Task<WorkoutSession> GetOrCreateSessionAsync(DateTime date)
-    {
-      var workoutDay = await context.WorkoutDays
-          .FirstOrDefaultAsync(d => d.DayOfWeek == date.DayOfWeek && d.IsActive) ?? throw new InvalidOperationException(
-            $"El día {date:dddd, dd/MM/yyyy} no esta agregado a los dias de ejercicios activos.");
-
-      var session = await context.WorkoutSessions
-          .FirstOrDefaultAsync(s =>
-              s.Date == date &&
-              s.UserId == UserId);
-
-      if (session == null)
+      foreach (var p in performed.Where(x => x.ExerciseId == exercise.Id))
       {
-        session = new WorkoutSession
+        if (p is StrengthSet s)
         {
-          Date = date,
-          WorkoutDayId = workoutDay.Id,
-          UserId = UserId
-        };
-
-        context.WorkoutSessions.Add(session);
-        await context.SaveChangesAsync();
+          vm.Sets.Add(new ExerciseSetVm
+          {
+            Id = s.Id,
+            Order = order++,
+            Reps = s.Reps,
+            Weight = s.Weight,
+            DurationMinutes = s.Duration.HasValue ? (int)s.Duration.Value.TotalMinutes : null
+          });
+        }
+        else if (p is TimedSet t)
+        {
+          vm.Sets.Add(new ExerciseSetVm
+          {
+            Id = t.Id,
+            Order = order++,
+            DurationMinutes = (int)t.Duration.TotalMinutes,
+            DistanceKm = t.DistanceKm,
+            Calories = t.Calories
+          });
+        }
       }
 
+      return vm;
+    }
+
+    private async Task<WorkoutSession> GetOrCreateSessionAsync(DateOnly date)
+    {
+      var session = await context.WorkoutSessions
+        .FirstOrDefaultAsync(s => s.Date == date && s.UserId == UserId);
+
+      if (session != null) return session;
+
+      var workoutDay = await context.WorkoutDays
+        .FirstAsync(wd => wd.DayOfWeek == date.DayOfWeek && wd.UserId == UserId);
+
+      session = new WorkoutSession
+      {
+        Date = date,
+        UserId = UserId,
+        WorkoutDayId = workoutDay.Id,
+        CreatedAt = Utils.Utilities.TodayRD()
+      };
+
+      context.WorkoutSessions.Add(session);
+      await context.SaveChangesAsync();
       return session;
     }
+
+    private async Task LoadActiveWorkoutDaysAsync()
+    {
+      WorkoutDays = await context.WorkoutDays
+        .Where(wd => wd.IsActive && wd.UserId == UserId)
+        .Select(wd => (int)wd.DayOfWeek)
+        .ToListAsync();
+    }
+  }
+
+  // ============================
+  // VIEW MODELS
+  // ============================
+  public class ExerciseAccordionItemVm
+  {
+    public int ExerciseId { get; set; }
+    public string ExerciseName { get; set; } = "";
+    public ExerciseType Type { get; set; }
+    public List<ExerciseSetVm> Sets { get; set; } = [];
+  }
+
+  public class ExerciseSetVm
+  {
+    public int Id { get; set; }
+    public int Order { get; set; }
+
+    public int? Reps { get; set; }
+    public decimal? Weight { get; set; }
+    public decimal? Volume =>
+        Reps.HasValue && Weight.HasValue
+            ? Reps.Value * Weight.Value
+            : null;
+
+
+    public int? DurationMinutes { get; set; }
+    public int? Calories { get; set; }
+    public decimal? DistanceKm { get; set; }
   }
 }

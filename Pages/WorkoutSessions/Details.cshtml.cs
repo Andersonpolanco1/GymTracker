@@ -3,63 +3,101 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
-namespace GymTracker.Pages.WorkoutSessions
+namespace GymTracker.Pages.WorkoutSessions;
+
+public class DetailsModel(GymTrackerDbContext ctx) : PageModel
 {
-  public class DetailsModel(GymTrackerDbContext ctx) : PageModel
+  public WorkoutSession? Session { get; set; } = null!;
+  public List<PerformedExerciseAccordionItem> AccordionItems { get; set; } = [];
+
+  public async Task<IActionResult> OnGetAsync(int id)
   {
+    Session = await ctx.WorkoutSessions
+      .Include(s => s.PerformedExercises)
+        .ThenInclude(p => p.Exercise)
+      .FirstOrDefaultAsync(s => s.Id == id);
 
-    // ===== DATOS PRINCIPALES =====
-    public WorkoutSession? Session { get; set; }
+    if (Session == null)
+      return NotFound();
 
-    public List<StrengthExerciseSummary> StrengthSummary { get; set; } = [];
-    public List<CardioSession> Cardio { get; set; } = [];
+    BuildAccordionItems();
 
-    // ===== TOTALES =====
-    public decimal TotalVolume { get; set; }
-    public int TotalCardioMinutes { get; set; }
+    return Page();
+  }
 
-    public async Task<IActionResult> OnGetAsync(int id)
-    {
-      Session = await ctx.WorkoutSessions
-          .Include(s => s.Sets)
-              .ThenInclude(es => es.Exercise)
-          .FirstOrDefaultAsync(s => s.Id == id);
+  private void BuildAccordionItems()
+  {
+    AccordionItems = Session.PerformedExercises
+      .GroupBy(p => p.ExerciseId)
+      .Select(group =>
+      {
+        var first = group.First();
 
-      if (Session == null)
-        return NotFound();
-
-      // ===== FUERZA: RESUMEN POR EJERCICIO =====
-      StrengthSummary = [.. Session.Sets
-          .GroupBy(s => s.Exercise.Name)
-          .Select(g => new StrengthExerciseSummary
+        var item = new PerformedExerciseAccordionItem
+        {
+          ExerciseId = first.ExerciseId,
+          ExerciseName = first.Exercise.Name,
+          Type = first switch
           {
-            ExerciseName = g.Key,
-            Sets = g.Count(),
-            TotalReps = g.Sum(x => x.Reps),
-            TotalVolume = g.Sum(x => x.Volume)
-          })
-          .OrderBy(e => e.ExerciseName)];
+            StrengthSet => "Fuerza",
+            TimedSet => "Cardio",
+            _ => "Otro"
+          }
+        };
 
-      TotalVolume = StrengthSummary.Sum(s => s.TotalVolume);
+        foreach (var p in group)
+        {
+          switch (p)
+          {
+            case StrengthSet s:
+              item.Details.Add(new PerformedExerciseDetailRow
+              {
+                Label = $"Serie {item.Details.Count + 1}",
+                Work = $"{s.Reps} reps",
+                Load = $"{s.Weight} lb",
+                Extra = $"{s.Volume} lb"
+              });
+              break;
 
-      // ===== CARDIO =====
-      Cardio = await ctx.CardioSessions
-          .Include(c => c.Exercise)
-          .Where(c => c.WorkoutSessionId == id)
-          .OrderBy(c => c.Exercise.Name)
-          .ToListAsync();
+            case TimedSet t:
+              item.Details.Add(new PerformedExerciseDetailRow
+              {
+                Label = "Sesión",
+                Work = $"{(int)t.Duration.TotalMinutes} min",
+                Load = t.DistanceKm != null ? $"{t.DistanceKm} km" : "-",
+                Extra = t.Calories != null ? $"{t.Calories} kcal" : "-"
+              });
+              break;
+          }
+        }
 
-      TotalCardioMinutes = Cardio.Sum(c => c.DurationMinutes);
+        item.Summary = item.Type == "Fuerza"
+          ? $"{item.Details.Count} series · {item.Details.Sum(d => int.Parse(d.Work.Split(' ')[0]))} reps"
+          : item.Details.First().Work;
 
-      return Page();
-    }
+        return item;
+      })
+      .OrderBy(i => i.ExerciseName)
+      .ToList();
   }
 
-  public class StrengthExerciseSummary
+  public class PerformedExerciseAccordionItem
   {
+    public int ExerciseId { get; set; }
     public string ExerciseName { get; set; } = "";
-    public int Sets { get; set; }
-    public int TotalReps { get; set; }
-    public decimal TotalVolume { get; set; }
+    public string Type { get; set; } = "";
+
+    public string Summary { get; set; } = "";
+
+    public List<PerformedExerciseDetailRow> Details { get; set; } = [];
   }
+
+  public class PerformedExerciseDetailRow
+  {
+    public string Label { get; set; } = "";
+    public string Work { get; set; } = "";
+    public string Load { get; set; } = "";
+    public string Extra { get; set; } = "";
+  }
+
 }

@@ -39,6 +39,17 @@
         <span asp-validation-for="Exercise.MuscleId" class="text-danger"></span>
     </div>
 
+    <div class="mb-3">
+        <label asp-for="Exercise.Notes" class="form-label">
+            Nota / Consejo <span class="text-muted">(opcional)</span>
+        </label>
+        <textarea asp-for="Exercise.Notes"
+                  class="form-control"
+                  rows="3"
+                  placeholder="Ej: Mantén la espalda recta y controla la bajada"></textarea>
+        <span asp-validation-for="Exercise.Notes" class="text-danger"></span>
+    </div>
+
     <div class="d-flex justify-content-between mt-4">
         <a asp-page="Index" class="btn btn-outline-secondary">Volver</a>
         <button type="submit" class="btn btn-primary">Guardar</button>

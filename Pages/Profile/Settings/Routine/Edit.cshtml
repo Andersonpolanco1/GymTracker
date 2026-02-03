@@ -1,0 +1,217 @@
+﻿@page "{id:int}"
+@model GymTracker.Pages.Maintenance.Routine.EditModel
+@using GymTracker.Enums
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-page="/Profile/Settings/Index">Configuración</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a asp-page="/Profile/Settings/Routine/Index">Rutina</a>
+        </li>
+        <li class="breadcrumb-item active">
+            Editar
+        </li>
+    </ol>
+</nav>
+
+<h2 class="mb-4">
+    Configurar rutina – @Utils.Utilities.GetDayNameInSpanishCapitalized(Model.Day.DayOfWeek)
+</h2>
+
+<hr />
+
+<!-- ================= AGREGAR EJERCICIO ================= -->
+<h4 class="mb-3">Agregar ejercicio</h4>
+
+<form method="post" asp-page-handler="AddExercise" class="row g-3 mb-4">
+
+    <div class="col-md-5">
+        <select asp-for="ExerciseId"
+                class="form-select"
+                id="exerciseSelect">
+            <option value="">Selecciona un ejercicio</option>
+            @foreach (var e in Model.AllExercises)
+            {
+                <option value="@e.Id" data-type="@e.Type">
+                    @e.Name
+                </option>
+            }
+        </select>
+    </div>
+
+    <!-- FUERZA -->
+    <div class="col-md-2 strength-field">
+        <input asp-for="PlannedSets" class="form-control" placeholder="Series" />
+    </div>
+
+    <div class="col-md-2 strength-field">
+        <input asp-for="PlannedReps" class="form-control" placeholder="Repeticiones" />
+    </div>
+
+    <!-- FUERZA -->
+
+    <div class="col-md-2 strength-field">
+        <input asp-for="PlannedDuration" class="form-control" placeholder="Duración (seg)" />
+    </div>
+
+    <!-- CARDIO -->
+
+    <div class="col-md-2 cardio-field d-none">
+        <input asp-for="PlannedDuration" class="form-control" placeholder="Duración (seg)" />
+    </div>
+
+    <div class="col-md-12 text-end">
+        <button class="btn btn-primary">
+            ➕ Agregar
+        </button>
+    </div>
+</form>
+
+<br />
+<h5>Ejercicios Programados</h5>
+<hr />
+
+<div class="accordion mb-4" id="routineAccordion">
+
+    <!-- ================= FUERZA ================= -->
+    <div class="accordion-item bg-light">
+        <h2 class="accordion-header">
+            <button class="accordion-button"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#strengthSection">
+                🏋️ Fuerza
+                <span class="badge bg-secondary ms-2">
+                    @Model.StrengthExercisesInDay.Count
+                </span>
+            </button>
+        </h2>
+
+        <div id="strengthSection"
+             class="accordion-collapse collapse show">
+            <div class="accordion-body">
+
+                @if (Model.StrengthExercisesInDay.Any())
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var e in Model.StrengthExercisesInDay)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>
+                                    <strong>@e.Exercise.Name</strong>
+                                    <span class="text-muted ms-2">
+                                        @(
+                                            e.PlannedReps.HasValue
+                                            ? $"{e.PlannedSets} x {e.PlannedReps}"
+                                            : e.PlannedDurationSeconds.HasValue
+                                            ? (e.PlannedDurationSeconds.Value >= 60
+                                            ? $"{e.PlannedDurationSeconds.Value / 60} min"
+                                            : $"{e.PlannedDurationSeconds.Value} seg")
+                                            : ""
+                                            )
+                                    </span>
+                                </span>
+
+                                <form method="post"
+                                      asp-page-handler="RemoveExercise"
+                                      asp-route-id="@Model.Day.Id"
+                                      asp-route-exId="@e.Id">
+                                    <button class="btn btn-link text-danger p-0">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">
+                        No hay ejercicios de fuerza
+                    </p>
+                }
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= CARDIO ================= -->
+    <div class="accordion-item bg-light">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#cardioSection">
+                ❤️ Cardio
+                <span class="badge bg-secondary ms-2">
+                    @Model.CardioExercisesInDay.Count
+                </span>
+            </button>
+        </h2>
+
+        <div id="cardioSection"
+             class="accordion-collapse collapse">
+            <div class="accordion-body">
+
+                @if (Model.CardioExercisesInDay.Any())
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var e in Model.CardioExercisesInDay)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>
+                                    <strong>@e.Exercise.Name</strong>
+                                    <span class="text-muted ms-2">
+                                        @{
+                                            if (e.PlannedDurationSeconds.HasValue)
+                                            {
+                                                var s = e.PlannedDurationSeconds.Value;
+                                                @($"{(s >= 60 ? $"{s / 60} min" : $"{s} seg")}")
+                                            }
+                                        }
+                                    </span>
+                                </span>
+
+                                <form method="post"
+                                      asp-page-handler="RemoveExercise"
+                                      asp-route-id="@Model.Day.Id"
+                                      asp-route-exId="@e.Id">
+                                    <button class="btn btn-link text-danger p-0">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">
+                        No hay cardio agregado
+                    </p>
+                }
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        const select = document.getElementById('exerciseSelect');
+
+        select.addEventListener('change', function () {
+            const type = this.options[this.selectedIndex]?.dataset.type;
+
+            document.querySelectorAll('.strength-field')
+                .forEach(e => e.classList.toggle('d-none', type === 'Cardio'));
+
+            document.querySelectorAll('.cardio-field')
+            .forEach(e => e.classList.toggle('d-none', type !== 'Cardio'));
+        });
+    </script>
+}

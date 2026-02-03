@@ -36,18 +36,32 @@
                     <ul class="navbar-nav flex-grow-1">
                         @if (User.Identity!.IsAuthenticated)
                         {
-                            <li class="nav-item mx-2">
-                                <a class="nav-link text-dark" asp-page="/Index">Inicio</a>
-                            </li>
-                            <li class="nav-item mx-2">
-                                <a class="nav-link text-dark" asp-page="/WorkoutSessions/Index">Historial</a>
-                            </li>
-                            <li class="nav-item mx-2">
-                                <a class="nav-link text-dark" asp-page="/Routine/Index">Rutina Semanal</a>
-                            </li>
-                            <li class="nav-item mx-2">
-                                <a class="nav-link text-dark" asp-page="/Maintenance/Index">Mantenimiento</a>
-                            </li>
+                            <ul class="navbar-nav flex-grow-1">
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-page="/Index">Inicio</a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-page="/WorkoutSessions/Index">Historial de entrenamiento</a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-page="/Profile/Settings/Index">
+                                        Mi perfil
+                                    </a>
+                                </li>
+
+
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link text-danger" asp-page="/Admin/Index">
+                                            Administración
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+
                         }
                     </ul>
 

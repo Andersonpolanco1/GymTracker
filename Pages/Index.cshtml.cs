@@ -55,7 +55,8 @@ namespace GymTracker.Pages
             Muscle = x.Exercise.Muscle!.Name,
             Name = x.Exercise.Name,
             Sets = x.PlannedSets,
-            Reps = x.PlannedReps
+            Reps = x.PlannedReps,
+            Minutes = x.PlannedDurationSeconds.HasValue ? x.PlannedDurationSeconds.Value: null
           })
           .OrderBy(x => x.Muscle)
           .ToList();
@@ -79,6 +80,8 @@ namespace GymTracker.Pages
       public string Name { get; set; } = string.Empty;
       public int Sets { get; set; }
       public int? Reps { get; set; }
+      public int? Minutes { get; set; }
+
     }
 
     public class CardioItem

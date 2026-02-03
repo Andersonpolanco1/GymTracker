@@ -1,6 +1,6 @@
 ﻿namespace GymTracker.Models
 {
-  public class TimedExerciseSession : PerformedExercise
+  public class TimedSet : PerformedExercise
   {
     public TimeSpan Duration { get; set; }
     public decimal? DistanceKm { get; set; }

@@ -10,37 +10,42 @@ namespace GymTracker.Pages.WorkoutSessions
 
     public async Task OnGetAsync()
     {
-      // 1 Traemos sesiones con sets
       var sessions = await ctx.WorkoutSessions
           .Include(s => s.WorkoutDay)
-          .Include(s => s.Sets)
+          .Include(s => s.PerformedExercises)
+          .OrderByDescending(s => s.Date)
           .ToListAsync();
 
-      // 2 Calculamos todo en memoria
-      Sessions = sessions
-          .Select(s => new WorkoutSessionRow
-          {
-            Id = s.Id,
-            Date = s.Date,
-            DayName = Utils.Utilities.GetDayNameInSpanishCapitalized( s.WorkoutDay.DayOfWeek),
+      Sessions = sessions.Select(s =>
+      {
+        var strength = s.PerformedExercises
+            .OfType<StrengthSet>();
 
-            StrengthSets = s.Sets.Count,
+        var cardio = s.PerformedExercises
+            .OfType<TimedSet>();
 
-            TotalVolume = s.Sets.Sum(x => x.Reps * x.Weight),
+        return new WorkoutSessionRow
+        {
+          Id = s.Id,
+          Date = s.Date,
+          DayName = Utils.Utilities.GetDayNameInSpanishCapitalized(
+              s.WorkoutDay.DayOfWeek),
 
-            CardioMinutes = ctx.CardioSessions
-                  .Where(c => c.WorkoutSessionId == s.Id)
-                  .Sum(c => c.DurationMinutes)
-          })
-          .OrderByDescending(s => s.Date)
-          .ToList();
+          StrengthSets = strength.Count(),
+
+          TotalVolume = strength.Sum(x => x.Reps!.Value * x.Weight!.Value),
+
+          CardioMinutes = (int)cardio
+              .Sum(c => c.Duration.TotalMinutes)
+        };
+      }).ToList();
     }
   }
 
   public class WorkoutSessionRow
   {
     public int Id { get; set; }
-    public DateTime Date { get; set; }
+    public DateOnly Date { get; set; }
     public string DayName { get; set; } = "";
 
     public int StrengthSets { get; set; }

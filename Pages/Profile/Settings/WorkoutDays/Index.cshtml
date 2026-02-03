@@ -4,10 +4,22 @@
     ViewData["Title"] = "Dias de entrenamiento";
 }
 
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-page="/Profile/Settings/Index">Configuración</a>
+        </li>
+        <li class="breadcrumb-item active">
+            Días de entrenamiento
+        </li>
+    </ol>
+</nav>
+
+
 <h2 class="mb-4">Días de entrenamiento</h2>
 
 <div class="mb-4">
-    <a asp-page="/Maintenance/Routine/Index"
+    <a asp-page="/Profile/Settings/Routine/Index"
        class="link-primary text-decoration-none">
         ⚙️ Agregar/eliminar ejercicios a dias
     </a>

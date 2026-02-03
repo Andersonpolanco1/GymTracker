@@ -91,41 +91,6 @@ namespace GymTracker.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("GymTracker.Models.CardioSession", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("AvgHeartRate")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Calories")
-                        .HasColumnType("int");
-
-                    b.Property<decimal?>("DistanceKm")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("DurationMinutes")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ExerciseId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("WorkoutSessionId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ExerciseId");
-
-                    b.HasIndex("WorkoutSessionId");
-
-                    b.ToTable("CardioSessions");
-                });
-
             modelBuilder.Entity("GymTracker.Models.Exercise", b =>
                 {
                     b.Property<int>("Id")
@@ -159,6 +124,7 @@ namespace GymTracker.Migrations
                             Id = 1,
                             MuscleId = 1,
                             Name = "Peso muerto (espalda baja)",
+                            Notes = "Mantén la espalda neutra y activa el core durante todo el movimiento.",
                             Type = 1
                         },
                         new
@@ -166,6 +132,7 @@ namespace GymTracker.Migrations
                             Id = 2,
                             MuscleId = 1,
                             Name = "Dominadas pronas",
+                            Notes = "Inicia el movimiento con la espalda, no con los brazos.",
                             Type = 1
                         },
                         new
@@ -173,6 +140,7 @@ namespace GymTracker.Migrations
                             Id = 3,
                             MuscleId = 1,
                             Name = "Remo con barra",
+                            Notes = "Evita balancearte y lleva la barra hacia el ombligo.",
                             Type = 1
                         },
                         new
@@ -180,6 +148,7 @@ namespace GymTracker.Migrations
                             Id = 4,
                             MuscleId = 1,
                             Name = "Jalón al pecho agarre neutro",
+                            Notes = "Aprieta los omóplatos al bajar y controla la subida.",
                             Type = 1
                         },
                         new
@@ -187,6 +156,7 @@ namespace GymTracker.Migrations
                             Id = 5,
                             MuscleId = 1,
                             Name = "Remo en polea baja",
+                            Notes = "Espalda recta y pausa breve al final del tirón.",
                             Type = 1
                         },
                         new
@@ -194,6 +164,7 @@ namespace GymTracker.Migrations
                             Id = 6,
                             MuscleId = 1,
                             Name = "Remo pecho apoyado en máquina",
+                            Notes = "Concéntrate en la contracción sin usar impulso.",
                             Type = 1
                         },
                         new
@@ -201,6 +172,7 @@ namespace GymTracker.Migrations
                             Id = 10,
                             MuscleId = 2,
                             Name = "Curl con barra",
+                            Notes = "Codos pegados al cuerpo y movimiento controlado.",
                             Type = 1
                         },
                         new
@@ -208,6 +180,7 @@ namespace GymTracker.Migrations
                             Id = 11,
                             MuscleId = 2,
                             Name = "Curl en banco inclinado",
+                            Notes = "Extiende bien los brazos antes de subir el peso.",
                             Type = 1
                         },
                         new
@@ -215,6 +188,7 @@ namespace GymTracker.Migrations
                             Id = 12,
                             MuscleId = 2,
                             Name = "Curl en polea baja",
+                            Notes = "Mantén tensión constante durante todo el recorrido.",
                             Type = 1
                         },
                         new
@@ -222,6 +196,7 @@ namespace GymTracker.Migrations
                             Id = 13,
                             MuscleId = 2,
                             Name = "Predicador",
+                            Notes = "Evita bloquear los codos al estirar.",
                             Type = 1
                         },
                         new
@@ -229,6 +204,7 @@ namespace GymTracker.Migrations
                             Id = 14,
                             MuscleId = 2,
                             Name = "Curl martillo",
+                            Notes = "Controla la bajada para mayor activación.",
                             Type = 1
                         },
                         new
@@ -236,6 +212,7 @@ namespace GymTracker.Migrations
                             Id = 20,
                             MuscleId = 3,
                             Name = "Prensa de piernas",
+                            Notes = "No bloquees las rodillas al extender.",
                             Type = 1
                         },
                         new
@@ -243,6 +220,7 @@ namespace GymTracker.Migrations
                             Id = 21,
                             MuscleId = 3,
                             Name = "Zancadas caminando",
+                            Notes = "Paso largo y torso erguido.",
                             Type = 1
                         },
                         new
@@ -250,6 +228,7 @@ namespace GymTracker.Migrations
                             Id = 22,
                             MuscleId = 3,
                             Name = "Extensiones de piernas",
+                            Notes = "Sube controlado y aprieta el cuádriceps arriba.",
                             Type = 1
                         },
                         new
@@ -257,6 +236,7 @@ namespace GymTracker.Migrations
                             Id = 23,
                             MuscleId = 3,
                             Name = "Elevaciones de talones de pie",
+                            Notes = "Pausa breve arriba para activar gemelos.",
                             Type = 1
                         },
                         new
@@ -264,6 +244,7 @@ namespace GymTracker.Migrations
                             Id = 24,
                             MuscleId = 3,
                             Name = "Hack squat",
+                            Notes = "Apoya bien la espalda y controla la bajada.",
                             Type = 1
                         },
                         new
@@ -271,6 +252,7 @@ namespace GymTracker.Migrations
                             Id = 25,
                             MuscleId = 3,
                             Name = "Curl femoral sentado",
+                            Notes = "Evita impulsarte con la cadera.",
                             Type = 1
                         },
                         new
@@ -278,6 +260,7 @@ namespace GymTracker.Migrations
                             Id = 26,
                             MuscleId = 3,
                             Name = "Curl femoral acostado",
+                            Notes = "Controla la bajada del peso.",
                             Type = 1
                         },
                         new
@@ -285,6 +268,7 @@ namespace GymTracker.Migrations
                             Id = 27,
                             MuscleId = 3,
                             Name = "Gemelos en prensa",
+                            Notes = "Recorrido completo, baja bien el talón.",
                             Type = 1
                         },
                         new
@@ -292,6 +276,7 @@ namespace GymTracker.Migrations
                             Id = 30,
                             MuscleId = 4,
                             Name = "Press militar con barra",
+                            Notes = "Aprieta el core y evita arquear la espalda.",
                             Type = 1
                         },
                         new
@@ -299,6 +284,7 @@ namespace GymTracker.Migrations
                             Id = 31,
                             MuscleId = 4,
                             Name = "Face pull",
+                            Notes = "Lleva la cuerda hacia la cara separando las manos.",
                             Type = 1
                         },
                         new
@@ -306,6 +292,7 @@ namespace GymTracker.Migrations
                             Id = 32,
                             MuscleId = 4,
                             Name = "Arnold press",
+                            Notes = "Movimiento fluido sin bloquear codos.",
                             Type = 1
                         },
                         new
@@ -313,6 +300,7 @@ namespace GymTracker.Migrations
                             Id = 33,
                             MuscleId = 4,
                             Name = "Elevaciones laterales en polea",
+                            Notes = "Sube hasta la altura del hombro, no más.",
                             Type = 1
                         },
                         new
@@ -320,6 +308,7 @@ namespace GymTracker.Migrations
                             Id = 34,
                             MuscleId = 4,
                             Name = "Elevaciones posteriores en máquina",
+                            Notes = "Concéntrate en deltoide posterior, no en los brazos.",
                             Type = 1
                         },
                         new
@@ -327,6 +316,7 @@ namespace GymTracker.Migrations
                             Id = 40,
                             MuscleId = 5,
                             Name = "Press inclinado con mancuernas",
+                            Notes = "Baja controlado y empuja sin juntar mancuernas.",
                             Type = 1
                         },
                         new
@@ -334,6 +324,7 @@ namespace GymTracker.Migrations
                             Id = 41,
                             MuscleId = 5,
                             Name = "Press plano con barra",
+                            Notes = "Pies firmes y escápulas retraídas.",
                             Type = 1
                         },
                         new
@@ -341,6 +332,7 @@ namespace GymTracker.Migrations
                             Id = 42,
                             MuscleId = 5,
                             Name = "Fondos en paralelas (pecho)",
+                            Notes = "Inclina ligeramente el torso hacia adelante.",
                             Type = 1
                         },
                         new
@@ -348,6 +340,7 @@ namespace GymTracker.Migrations
                             Id = 43,
                             MuscleId = 5,
                             Name = "Press inclinado en máquina",
+                            Notes = "Controla el recorrido completo.",
                             Type = 1
                         },
                         new
@@ -355,6 +348,7 @@ namespace GymTracker.Migrations
                             Id = 44,
                             MuscleId = 5,
                             Name = "Aperturas con mancuernas",
+                            Notes = "Mantén codos semiflexionados.",
                             Type = 1
                         },
                         new
@@ -362,6 +356,7 @@ namespace GymTracker.Migrations
                             Id = 45,
                             MuscleId = 5,
                             Name = "Cruce unilateral en polea",
+                            Notes = "Aprieta el pecho al cruzar.",
                             Type = 1
                         },
                         new
@@ -369,6 +364,7 @@ namespace GymTracker.Migrations
                             Id = 50,
                             MuscleId = 6,
                             Name = "Press cerrado con barra",
+                            Notes = "Codos cerca del cuerpo.",
                             Type = 1
                         },
                         new
@@ -376,6 +372,7 @@ namespace GymTracker.Migrations
                             Id = 51,
                             MuscleId = 6,
                             Name = "Extensión por encima de la cabeza en polea con barra",
+                            Notes = "Mantén brazos fijos durante el movimiento.",
                             Type = 1
                         },
                         new
@@ -383,6 +380,7 @@ namespace GymTracker.Migrations
                             Id = 52,
                             MuscleId = 6,
                             Name = "Extensión en polea con cuerda",
+                            Notes = "Separa la cuerda al final.",
                             Type = 1
                         },
                         new
@@ -390,6 +388,7 @@ namespace GymTracker.Migrations
                             Id = 53,
                             MuscleId = 6,
                             Name = "Rompecráneos",
+                            Notes = "Baja el peso hacia la frente controladamente.",
                             Type = 1
                         },
                         new
@@ -397,6 +396,7 @@ namespace GymTracker.Migrations
                             Id = 60,
                             MuscleId = 7,
                             Name = "Elevaciones de piernas colgado",
+                            Notes = "Evita balancearte.",
                             Type = 1
                         },
                         new
@@ -404,6 +404,7 @@ namespace GymTracker.Migrations
                             Id = 61,
                             MuscleId = 7,
                             Name = "Plancha",
+                            Notes = "Cuerpo alineado y abdomen firme.",
                             Type = 1
                         },
                         new
@@ -411,6 +412,7 @@ namespace GymTracker.Migrations
                             Id = 62,
                             MuscleId = 7,
                             Name = "Ab wheel",
+                            Notes = "Mantén la cadera estable.",
                             Type = 1
                         },
                         new
@@ -418,6 +420,7 @@ namespace GymTracker.Migrations
                             Id = 63,
                             MuscleId = 7,
                             Name = "Crunch declinado",
+                            Notes = "Sube controlado sin tirar del cuello.",
                             Type = 1
                         },
                         new
@@ -425,6 +428,7 @@ namespace GymTracker.Migrations
                             Id = 64,
                             MuscleId = 7,
                             Name = "Russian twist",
+                            Notes = "Rota el torso, no solo los brazos.",
                             Type = 1
                         },
                         new
@@ -432,58 +436,23 @@ namespace GymTracker.Migrations
                             Id = 65,
                             MuscleId = 7,
                             Name = "Plancha lateral",
+                            Notes = "Mantén cadera elevada.",
                             Type = 1
                         },
                         new
                         {
                             Id = 100,
                             Name = "Caminadora",
+                            Notes = "Mantén postura erguida y ritmo constante.",
                             Type = 2
                         },
                         new
                         {
                             Id = 101,
-                            Name = "Escalera Mecanica",
+                            Name = "Escalera Mecánica",
+                            Notes = "Apoya todo el pie y controla la respiración.",
                             Type = 2
                         });
-                });
-
-            modelBuilder.Entity("GymTracker.Models.ExerciseSet", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ExerciseId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("RIR")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Reps")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("RestSeconds")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SetNumber")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Weight")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("WorkoutSessionId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ExerciseId");
-
-                    b.HasIndex("WorkoutSessionId");
-
-                    b.ToTable("ExerciseSets");
                 });
 
             modelBuilder.Entity("GymTracker.Models.Muscle", b =>
@@ -640,8 +609,11 @@ namespace GymTracker.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("Date")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -796,6 +768,9 @@ namespace GymTracker.Migrations
                 {
                     b.HasBaseType("GymTracker.Models.PerformedExercise");
 
+                    b.Property<TimeSpan?>("Duration")
+                        .HasColumnType("time");
+
                     b.Property<int?>("RIR")
                         .HasColumnType("int");
 
@@ -812,7 +787,7 @@ namespace GymTracker.Migrations
                     b.HasDiscriminator().HasValue("Strength");
                 });
 
-            modelBuilder.Entity("GymTracker.Models.TimedExerciseSession", b =>
+            modelBuilder.Entity("GymTracker.Models.TimedSet", b =>
                 {
                     b.HasBaseType("GymTracker.Models.PerformedExercise");
 
@@ -829,26 +804,13 @@ namespace GymTracker.Migrations
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("time");
 
+                    b.ToTable("PerformedExercises", t =>
+                        {
+                            t.Property("Duration")
+                                .HasColumnName("TimedSet_Duration");
+                        });
+
                     b.HasDiscriminator().HasValue("Timed");
-                });
-
-            modelBuilder.Entity("GymTracker.Models.CardioSession", b =>
-                {
-                    b.HasOne("GymTracker.Models.Exercise", "Exercise")
-                        .WithMany()
-                        .HasForeignKey("ExerciseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GymTracker.Models.WorkoutSession", "WorkoutSession")
-                        .WithMany("CardioSessions")
-                        .HasForeignKey("WorkoutSessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Exercise");
-
-                    b.Navigation("WorkoutSession");
                 });
 
             modelBuilder.Entity("GymTracker.Models.Exercise", b =>
@@ -858,25 +820,6 @@ namespace GymTracker.Migrations
                         .HasForeignKey("MuscleId");
 
                     b.Navigation("Muscle");
-                });
-
-            modelBuilder.Entity("GymTracker.Models.ExerciseSet", b =>
-                {
-                    b.HasOne("GymTracker.Models.Exercise", "Exercise")
-                        .WithMany()
-                        .HasForeignKey("ExerciseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GymTracker.Models.WorkoutSession", "WorkoutSession")
-                        .WithMany("Sets")
-                        .HasForeignKey("WorkoutSessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Exercise");
-
-                    b.Navigation("WorkoutSession");
                 });
 
             modelBuilder.Entity("GymTracker.Models.PerformedExercise", b =>
@@ -1019,11 +962,7 @@ namespace GymTracker.Migrations
 
             modelBuilder.Entity("GymTracker.Models.WorkoutSession", b =>
                 {
-                    b.Navigation("CardioSessions");
-
                     b.Navigation("PerformedExercises");
-
-                    b.Navigation("Sets");
                 });
 #pragma warning restore 612, 618
         }
