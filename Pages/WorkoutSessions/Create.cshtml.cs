@@ -40,58 +40,97 @@ namespace GymTracker.Pages.WorkoutSessions
 
     private async Task LoadPageAsync(DateOnly date)
     {
-      SelectedDate = date;
+      InitializeDateContext(date);
 
-      IsToday = SelectedDate == DateOnly.FromDateTime(Utils.Utilities.TodayRD());
-      DayName = Utils.Utilities.GetDayNameInSpanish(SelectedDate.DayOfWeek);
+      await LoadActiveWorkoutDayIdsAsync();
 
-      await LoadActiveWorkoutDaysAsync();
-
-      if (!WorkoutDays.Contains((int)SelectedDate.DayOfWeek))
+      if (!IsSelectedDayEnabled())
       {
-        ModelState.AddModelError(
-            "SelectedDate",
-            $"El día {DayName} no está habilitado."
-        );
+        AddDisabledDayError();
         return;
       }
 
-      var workoutDay = await context.WorkoutDays
-          .Include(wd => wd.Exercises)
-              .ThenInclude(wde => wde.Exercise)
-          .FirstAsync(wd =>
-              wd.DayOfWeek == SelectedDate.DayOfWeek &&
-              wd.UserId == UserId);
+      var workoutDay = await LoadSelectedWorkoutDayExercisesAsync();
+      var performedExercises = await GetPerformedExercisesAsync();
 
+      LoadRoutineExercises(workoutDay, performedExercises);
+      await LoadExtraExercisesAsync(workoutDay, performedExercises);
+    }
+
+    private void InitializeDateContext(DateOnly date)
+    {
+      SelectedDate = date;
+      IsToday = SelectedDate == DateOnly.FromDateTime(Utils.Utilities.TodayRD());
+      DayName = Utils.Utilities.GetDayNameInSpanish(SelectedDate.DayOfWeek);
+    }
+
+    private bool IsSelectedDayEnabled()
+    {
+      return WorkoutDays.Contains((int)SelectedDate.DayOfWeek);
+    }
+
+    private void AddDisabledDayError()
+    {
+      ModelState.AddModelError(
+          "SelectedDate",
+          $"El día {DayName} no está habilitado."
+      );
+    }
+    private async Task<WorkoutDay> LoadSelectedWorkoutDayExercisesAsync()
+    {
+      return await context.WorkoutDays
+        .Include(wd => wd.Exercises)
+          .ThenInclude(wde => wde.Exercise)
+        .FirstAsync(wd =>
+          wd.DayOfWeek == SelectedDate.DayOfWeek &&
+          wd.UserId == UserId);
+    }
+
+    private async Task<List<PerformedExercise>> GetPerformedExercisesAsync()
+    {
       var session = await GetSessionAsync(SelectedDate);
 
-      var performed = session == null
-        ? []
-        : await context.PerformedExercises
-            .Include(p => p.Exercise)
-            .Where(p => p.WorkoutSessionId == session.Id)
-            .ToListAsync();
+      if (session == null)
+        return [];
 
+      return await context.PerformedExercises
+        .Include(p => p.Exercise)
+        .Where(p => p.WorkoutSessionId == session.Id)
+        .ToListAsync();
+    }
 
-      var routineExerciseIds = workoutDay.Exercises
-          .Select(x => x.ExerciseId)
-          .ToHashSet();
-
+    private void LoadRoutineExercises(
+      WorkoutDay workoutDay,
+      List<PerformedExercise> performed)
+    {
       RoutineExercises = [.. workoutDay.Exercises
-          .Select(wde => BuildAccordionItem(wde.Exercise, performed))
-          .OrderBy(x => x.ExerciseName)];
+      .Select(wde => BuildAccordionItem(wde.Exercise, performed))
+      .OrderBy(x => x.ExerciseName)];
+    }
+
+
+    private async Task LoadExtraExercisesAsync(
+      WorkoutDay workoutDay,
+      List<PerformedExercise> performed)
+    {
+      var routineExerciseIds = workoutDay.Exercises
+        .Select(x => x.ExerciseId)
+        .ToHashSet();
 
       ExtraExercisesPerformed = [.. performed
-          .Where(p => !routineExerciseIds.Contains(p.ExerciseId))
-          .GroupBy(p => p.Exercise!)
-          .Select(g => BuildAccordionItem(g.Key, performed))
-          .OrderBy(x => x.ExerciseName)];
+        .Where(p => !routineExerciseIds.Contains(p.ExerciseId))
+        .GroupBy(p => p.Exercise!)
+        .Select(g => BuildAccordionItem(g.Key, performed))
+        .OrderBy(x => x.ExerciseName)];
 
       ExtraExercises = await context.Exercises
-          .Where(e => !routineExerciseIds.Contains(e.Id))
-          .OrderBy(e => e.Name)
-          .ToListAsync();
+        .Where(e => !routineExerciseIds.Contains(e.Id))
+        .OrderBy(e => e.Name)
+        .ToListAsync();
     }
+
+
+
 
     // ============================
     // ADD SET
@@ -276,8 +315,7 @@ namespace GymTracker.Pages.WorkoutSessions
 
     private async Task<WorkoutSession> GetOrCreateSessionAsync(DateOnly date)
     {
-      var session = await context.WorkoutSessions
-        .FirstOrDefaultAsync(s => s.Date == date && s.UserId == UserId);
+      var session = await GetSessionAsync(date);
 
       if (session != null) return session;
 
@@ -297,7 +335,7 @@ namespace GymTracker.Pages.WorkoutSessions
       return session;
     }
 
-    private async Task LoadActiveWorkoutDaysAsync()
+    private async Task LoadActiveWorkoutDayIdsAsync()
     {
       WorkoutDays = await context.WorkoutDays
         .Where(wd => wd.IsActive && wd.UserId == UserId)
