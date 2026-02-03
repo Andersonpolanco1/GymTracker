@@ -6,21 +6,34 @@
 }
 
 <div class="container mt-4">
-
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold mb-0">📆 Historial de Entrenamientos</h2>
-
-        <!-- LINK PARA CREAR NUEVA SESIÓN -->
-        <a asp-page="/WorkoutSessions/Create" class="btn btn-primary">
-            ➕ Crear sesión
-        </a>
+        <a asp-page="/WorkoutSessions/Create" class="btn btn-primary">➕ Crear sesión</a>
     </div>
+
+    <!-- FILTROS -->
+    <form method="get" class="row g-2 mb-3 align-items-end">
+        <div class="col-auto">
+            <label class="form-label">Año</label>
+            <select asp-for="SelectedYear" class="form-select" asp-items="@(new SelectList(Model.Years))">
+                <option value="">Todos</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <label class="form-label">Mes</label>
+            <select asp-for="SelectedMonth" class="form-select" asp-items="Model.Months">
+                <option value="">Todos</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-secondary">Filtrar</button>
+        </div>
+    </form>
+
 
     @if (!Model.Sessions.Any())
     {
-        <div class="alert alert-info">
-            No hay sesiones registradas todavía.
-        </div>
+        <div class="alert alert-info">No hay sesiones registradas todavía.</div>
     }
     else
     {
@@ -43,17 +56,11 @@
                             <tr>
                                 <td>@Utils.Utilities.GetLocalDateFormat(s.Date)</td>
                                 <td>@s.DayName</td>
-
                                 <td class="text-center">@s.StrengthSets</td>
                                 <td class="text-center">@s.TotalVolume</td>
                                 <td class="text-center">@s.CardioMinutes</td>
-
                                 <td class="text-end">
-                                    <a asp-page="/WorkoutSessions/Details"
-                                       asp-route-id="@s.Id"
-                                       class="btn btn-sm btn-outline-primary">
-                                        Ver detalle →
-                                    </a>
+                                    <a asp-page="/WorkoutSessions/Details" asp-route-id="@s.Id" class="btn btn-sm btn-outline-primary">Ver detalle →</a>
                                 </td>
                             </tr>
                         }
@@ -62,5 +69,4 @@
             </div>
         </div>
     }
-
 </div>

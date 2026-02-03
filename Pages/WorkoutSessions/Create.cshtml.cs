@@ -103,10 +103,19 @@ namespace GymTracker.Pages.WorkoutSessions
       WorkoutDay workoutDay,
       List<PerformedExercise> performed)
     {
+      var planned = 
+
       RoutineExercises = [.. workoutDay.Exercises
-      .Select(wde => BuildAccordionItem(wde.Exercise, performed))
+      .Select(wde => BuildAccordionItem(wde.Exercise, performed, GetPlannedSets(wde)))
       .OrderBy(x => x.ExerciseName)];
     }
+
+    private static int GetPlannedSets(WorkoutDayExercise wde)
+    {
+      var isStrenght = typeof(WorkoutDayExercise).IsInstanceOfType(wde);
+      return isStrenght ? wde.PlannedSets : 1;
+    }
+
 
 
     private async Task LoadExtraExercisesAsync(
@@ -265,14 +274,16 @@ namespace GymTracker.Pages.WorkoutSessions
     // ============================
     private ExerciseAccordionItemVm BuildAccordionItem(
       Exercise exercise,
-      List<PerformedExercise> performed)
+      List<PerformedExercise> performed,
+      int plannedSets = 0)
     {
       var vm = new ExerciseAccordionItemVm
       {
         ExerciseId = exercise.Id,
         ExerciseName = exercise.Name,
         Type = exercise.Type,
-        SelectedDate = SelectedDate
+        SelectedDate = SelectedDate,
+        PlannedSets = plannedSets
       };
 
       int order = 1;
@@ -353,7 +364,9 @@ namespace GymTracker.Pages.WorkoutSessions
     public string ExerciseName { get; set; } = "";
     public ExerciseType Type { get; set; }
     public List<ExerciseSetVm> Sets { get; set; } = [];
-    public DateOnly SelectedDate { get; set; } 
+    public DateOnly SelectedDate { get; set; }
+    public int PlannedSets { get; set; } = 0;
+
   }
 
   public class ExerciseSetVm

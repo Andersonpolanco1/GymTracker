@@ -61,16 +61,18 @@
 
                         <div class="accordion-item">
                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed"
+                                <button class="accordion-button collapsed d-flex justify-content-between"
                                         data-bs-toggle="collapse"
                                         data-bs-target="#@collapseId">
-                                    <strong>@item.ExerciseName</strong>
-                                    <span class="badge ms-2 @(item.Type == Enums.ExerciseType.Strength ? "bg-primary" : "bg-success")">
-                                        @item.Type
+                                    <div>
+                                        <strong>@item.ExerciseName</strong>
+                                    </div>
+
+                                    <span class="badge @(item.Sets.Count >= item.PlannedSets ? "bg-success" : "bg-secondary") ms-2">
+                                        @item.Sets.Count / @item.PlannedSets
                                     </span>
                                 </button>
                             </h2>
-
                             <div id="@collapseId" class="accordion-collapse collapse">
                                 <div class="accordion-body">
 

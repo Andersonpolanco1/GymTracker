@@ -88,6 +88,7 @@ namespace GymTracker.Pages.Maintenance.Routine
         else
         {
           entry.PlannedDurationSeconds = PlannedDuration;
+          entry.PlannedSets = 1;
         }
 
         _context.Add(entry);
