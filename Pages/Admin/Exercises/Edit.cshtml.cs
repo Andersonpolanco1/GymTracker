@@ -35,8 +35,9 @@ public class EditModel(GymTrackerDbContext context) : PageModel
     if (Exercise is not null)
     {
       bool exists = await _context.Exercises
-        .AnyAsync(e => e.Name == Exercise.Name);
-            if (exists)
+              .AnyAsync(e => e.Name == Exercise.Name && e.Id != Exercise.Id);
+
+      if (exists)
             {
               ModelState.AddModelError("Exercise.Name",
                   "Ya existe un ejercicio con este nombre.");

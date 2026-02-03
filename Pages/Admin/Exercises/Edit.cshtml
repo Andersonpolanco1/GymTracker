@@ -7,81 +7,49 @@
 
 <h2 class="mb-4">✏️ Editar ejercicio</h2>
 
-<!-- ================= ALERTAS ================= -->
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
-}
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
-}
-
 <!-- ================= FORMULARIO DE EDICIÓN ================= -->
-<form method="post" class="card shadow-sm p-4">
+<form method="post" asp-page-handler="Add" class="card shadow-sm p-4">
 
     <input type="hidden" asp-for="Exercise!.Id" />
 
-    <!-- NOMBRE -->
     <div class="mb-3">
-        <label asp-for="Exercise!.Name" class="form-label fw-semibold"></label>
+        <label asp-for="Exercise!.Name" class="form-label fw-semibold">Nombre</label>
         <input asp-for="Exercise!.Name" class="form-control" />
         <span asp-validation-for="Exercise!.Name" class="text-danger"></span>
     </div>
 
-    <!-- TIPO -->
     <div class="mb-3">
-        <label asp-for="Exercise!.Type" class="form-label fw-semibold"></label>
+        <label asp-for="Exercise!.Type" class="form-label fw-semibold">Tipo</label>
         <select asp-for="Exercise!.Type"
                 asp-items="Model.ExerciseTypes"
                 class="form-select"
                 id="exerciseType">
         </select>
+        <span asp-validation-for="Exercise!.Type" class="text-danger"></span>
     </div>
 
-    <!-- MÚSCULO -->
     <div class="mb-4">
-        <label class="form-label fw-semibold">Músculo</label>
+        <label asp-for="Exercise!.MuscleId" class="form-label fw-semibold">Músculo</label>
         <select asp-for="Exercise!.MuscleId"
                 asp-items="Model.Muscles"
                 class="form-select"
                 id="muscleSelect">
             <option value="">— Sin músculo (Cardio) —</option>
         </select>
-        <div class="form-text text-muted">
-            Solo aplica para ejercicios de fuerza.
-        </div>
+        <span asp-validation-for="Exercise!.MuscleId" class="text-danger"></span>
+        <div class="form-text text-muted">Solo fuerza.</div>
     </div>
 
-    <!-- NOTAS -->
     <div class="mb-4">
-        <label asp-for="Exercise!.Notes" class="form-label fw-semibold">
-            Notas
-        </label>
-
-        <textarea asp-for="Exercise!.Notes"
-                  class="form-control"
-                  rows="3"
-                  placeholder="Notas adicionales sobre el ejercicio">
-        </textarea>
-
-        <div class="form-text text-muted">
-            Campo opcional.
-        </div>
+        <label asp-for="Exercise!.Notes" class="form-label fw-semibold">Notas</label>
+        <textarea asp-for="Exercise!.Notes" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Exercise!.Notes" class="text-danger"></span>
     </div>
 
-
-    <!-- BOTONES GUARDAR Y CANCELAR -->
     <div class="d-flex justify-content-end gap-2">
-        <a asp-page="Index" class="btn btn-outline-secondary">
-            Cancelar
-        </a>
-
-        <button type="submit" class="btn btn-warning">
-            Guardar cambios
-        </button>
+        <a asp-page="Index" class="btn btn-outline-secondary">Cancelar</a>
+        <button type="submit" class="btn btn-warning">Guardar cambios</button>
     </div>
-
 </form>
 
 <!-- ================= BOTÓN ELIMINAR ================= -->
