@@ -31,14 +31,14 @@
                 @if (Model.Type == GymTracker.Enums.ExerciseType.Strength)
                 {
                     <td>@s.Reps</td>
-                    <td>@s.Weight</td>
+                    <td>@(s.Weight.HasValue ? $"{s.Weight} lb" : null)</td>
                     <td>@s.Volume</td>
-                    <td>@s.DurationMinutes</td>
+                    <td>@(s.DurationMinutes.HasValue ? $"{s.DurationMinutes} min" : null)</td>
                 }
                 else
                 {
-                    <td>@s.DurationMinutes</td>
-                    <td>@s.DistanceKm</td>
+                    <td>@(s.DurationMinutes.HasValue ? $"{s.DurationMinutes} min" : null)</td>
+                    <td>@(s.DistanceKm.HasValue ? $"{s.DistanceKm} km" : null)</td>
                     <td>@s.Calories</td>
                 }
 

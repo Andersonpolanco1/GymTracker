@@ -1,0 +1,30 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Acceso denegado";
+}
+
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow-sm p-4 text-center" style="max-width: 420px;">
+
+        <div class="mb-3">
+            <span style="font-size: 3rem;">🚫</span>
+        </div>
+
+        <h3 class="mb-2">Acceso denegado</h3>
+
+        <p class="text-muted mb-4">
+            No tienes permisos para acceder a esta sección.
+        </p>
+
+        <div class="d-grid gap-2">
+            <a asp-page="/Index" class="btn btn-primary">
+                Volver al inicio
+            </a>
+
+            <a asp-page="/Login" class="btn btn-outline-secondary">
+                Cambiar de usuario
+            </a>
+        </div>
+    </div>
+</div>

@@ -2,14 +2,14 @@ using GymTracker;
 using GymTracker.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages(options =>
-{  options.Conventions.AuthorizeFolder("/");
-
+{
+  options.Conventions.AuthorizeFolder("/");
   options.Conventions.AllowAnonymousToPage("/Login");
+  options.Conventions.AuthorizeFolder("/Admin", "AdminOnly");
 });
 
 builder.Services.AddDbContext<GymTrackerDbContext>(options =>
@@ -26,13 +26,15 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-  options.LoginPath = "/Login";         
-  options.AccessDeniedPath = "/Login";
-  options.ExpireTimeSpan = TimeSpan.FromHours(8); 
+  options.LoginPath = "/Login";
+  options.AccessDeniedPath = "/AccessDenied";
+  options.ExpireTimeSpan = TimeSpan.FromHours(8);
   options.SlidingExpiration = true;
 });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorizationBuilder()
+  .AddPolicy("AdminOnly", policy =>
+      policy.RequireRole("Admin"));
 
 var app = builder.Build();
 
@@ -48,32 +50,10 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication(); 
+app.UseAuthentication();
 app.UseAuthorization();
 
-// -----------------------
-// Crear usuario administrador si no existe y su rutina
-// -----------------------
-using (var scope = app.Services.CreateScope())
-{
-  var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-  string adminEmail = "andersonpolancocontreras@gmail.com";
-  string adminPassword = "Andy1993";
-
-  if (await userManager.FindByEmailAsync(adminEmail) == null)
-  {
-    var user = new ApplicationUser
-    {
-      UserName = adminEmail,
-      Email = adminEmail,
-      DisplayName = "Anderson"
-    };
-
-    await userManager.CreateAsync(user, adminPassword);
-    await userManager.AddClaimAsync(user, new Claim("DisplayName", user.DisplayName));
-  }
-}
 
 app.MapRazorPages();
 
