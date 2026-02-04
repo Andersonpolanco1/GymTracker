@@ -7,79 +7,75 @@
 
 <h2 class="mb-4">✏️ Editar ejercicio</h2>
 
-<!-- ================= FORMULARIO DE EDICIÓN ================= -->
-<form method="post" asp-page-handler="Add" class="card shadow-sm p-4">
+<div class="row">
+    <div class="col-lg-7">
+        <form method="post" asp-page-handler="Add" class="card shadow-sm p-4" enctype="multipart/form-data">
 
-    <input type="hidden" asp-for="Exercise!.Id" />
+            <input type="hidden" asp-for="Exercise!.Id" />
+            <input type="hidden" asp-for="Exercise!.ImagePath" />
 
-    <div class="mb-3">
-        <label asp-for="Exercise!.Name" class="form-label fw-semibold">Nombre</label>
-        <input asp-for="Exercise!.Name" class="form-control" />
-        <span asp-validation-for="Exercise!.Name" class="text-danger"></span>
+            <div class="mb-3">
+                <label asp-for="Exercise!.Name" class="form-label fw-semibold"></label>
+                <input asp-for="Exercise!.Name" class="form-control" />
+                <span asp-validation-for="Exercise!.Name" class="text-danger"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Exercise!.Type" class="form-label fw-semibold"></label>
+                    <select asp-for="Exercise!.Type" asp-items="Model.ExerciseTypes" class="form-select" id="exerciseType"></select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Exercise!.MuscleId" class="form-label fw-semibold">Músculo</label>
+                    <select asp-for="Exercise!.MuscleId" asp-items="Model.Muscles" class="form-select" id="muscleSelect">
+                        <option value="">— Sin músculo (Cardio) —</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Exercise!.Notes" class="form-label fw-semibold"></label>
+                <textarea asp-for="Exercise!.Notes" class="form-control" rows="3"></textarea>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Exercise!.ImageFile" class="form-label fw-bold">Actualizar animación (GIF)</label>
+                <input asp-for="Exercise!.ImageFile" class="form-control" accept=".gif" />
+                <span asp-validation-for="Exercise!.ImageFile" class="text-danger"></span>
+                <div class="form-text">Dejar vacío para conservar la imagen actual.</div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <a asp-page="Index" class="btn btn-outline-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-warning">Guardar cambios</button>
+            </div>
+        </form>
     </div>
 
-    <div class="mb-3">
-        <label asp-for="Exercise!.Type" class="form-label fw-semibold">Tipo</label>
-        <select asp-for="Exercise!.Type"
-                asp-items="Model.ExerciseTypes"
-                class="form-select"
-                id="exerciseType">
-        </select>
-        <span asp-validation-for="Exercise!.Type" class="text-danger"></span>
+    <div class="col-lg-5">
+        <div class="sticky-top" style="top: 20px;">
+            <h5 class="mb-3">Visualización actual</h5>
+            <div id="previewContainer">
+                @* Pasamos el Path y las Notas al componente reutilizable *@
+                <partial name="_ExercisePreview" model="(Model.Exercise?.ImagePath, Model.Exercise?.Notes)" />
+            </div>
+        </div>
     </div>
-
-    <div class="mb-4">
-        <label asp-for="Exercise!.MuscleId" class="form-label fw-semibold">Músculo</label>
-        <select asp-for="Exercise!.MuscleId"
-                asp-items="Model.Muscles"
-                class="form-select"
-                id="muscleSelect">
-            <option value="">— Sin músculo (Cardio) —</option>
-        </select>
-        <span asp-validation-for="Exercise!.MuscleId" class="text-danger"></span>
-        <div class="form-text text-muted">Solo fuerza.</div>
-    </div>
-
-    <div class="mb-4">
-        <label asp-for="Exercise!.Notes" class="form-label fw-semibold">Notas</label>
-        <textarea asp-for="Exercise!.Notes" class="form-control" rows="3"></textarea>
-        <span asp-validation-for="Exercise!.Notes" class="text-danger"></span>
-    </div>
-
-    <div class="d-flex justify-content-end gap-2">
-        <a asp-page="Index" class="btn btn-outline-secondary">Cancelar</a>
-        <button type="submit" class="btn btn-warning">Guardar cambios</button>
-    </div>
-</form>
-
-<!-- ================= BOTÓN ELIMINAR ================= -->
-<div class="mt-4">
-    <form method="post" asp-page-handler="Delete" asp-route-id="@Model.Exercise!.Id" class="d-inline">
-        <button type="submit" class="btn btn-danger"
-                onclick="return confirm('¿Está seguro de eliminar este ejercicio? Esta acción solo se permitirá si ningún usuario lo ha usado.')">
-            Eliminar ejercicio
-        </button>
-    </form>
 </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-
-    <script>
-        const typeSelect = document.getElementById('exerciseType');
-        const muscleSelect = document.getElementById('muscleSelect');
-
-        function toggleMuscleSelect() {
-            const isCardio = typeSelect.value === 'Cardio';
-
-            muscleSelect.disabled = isCardio;
-
-            if (isCardio) {
-                muscleSelect.value = '';
-            }
-        }
-
-        toggleMuscleSelect();
-        typeSelect.addEventListener('change', toggleMuscleSelect);
-    </script>
-}
+<hr class="my-5" />
+<div class="card border-danger p-3 bg-light">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="text-danger mb-0">Zona de peligro</h5>
+            <small class="text-muted">Esta acción no se puede deshacer.</small>
+        </div>
+        <form method="post" asp-page-handler="Delete" asp-route-id="@Model.Exercise!.Id">
+            <button type="submit" class="btn btn-danger"
+                    onclick="return confirm('¿Está seguro de eliminar este ejercicio?')">
+                Eliminar ejercicio
+            </button>
+        </form>
+    </div>
+</div>

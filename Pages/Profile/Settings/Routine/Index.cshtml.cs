@@ -1,20 +1,25 @@
 using GymTracker.Enums;
+using GymTracker.Models;
 using GymTracker.ViewModels.MaintenanceModels;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
 namespace GymTracker.Pages.Maintenance.Routine;
 
-public class IndexModel(GymTrackerDbContext context) : PageModel
+public class IndexModel(GymTrackerDbContext context, UserManager<ApplicationUser> userManager) : PageModel
 {
   public List<WorkoutDaySummaryVm> Days { get; set; } = [];
 
   public async Task OnGetAsync()
   {
+    var userId = userManager.GetUserId(User)!;
+
     var daysRaw = await context.WorkoutDays
         .Include(d => d.Exercises)
             .ThenInclude(e => e.Exercise)
                 .ThenInclude(e => e.Muscle)
+                .Where(d => d.UserId == userId && d.IsActive) 
         .OrderBy(d => d.DayOfWeek)
         .ToListAsync();
 

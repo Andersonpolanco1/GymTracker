@@ -1,5 +1,6 @@
 ﻿using GymTracker.Enums;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GymTracker.Models
 {
@@ -17,6 +18,11 @@ namespace GymTracker.Models
     public Muscle? Muscle { get; set; }
 
     public string? Notes { get; set; }
+
+    public string? ImagePath { get; set; } // Ruta relativa: /uploads/ejercicio.gif
+
+    [NotMapped]
+    public IFormFile? ImageFile { get; set; } // El archivo que viene del form
 
   }
 

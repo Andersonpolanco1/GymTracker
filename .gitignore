@@ -428,3 +428,6 @@ publish/
 
 # Ignorar la base de datos SQLite
 gymtracker.db
+
+# Carpeta de imágenes subidas
+wwwroot/uploads/exercises/

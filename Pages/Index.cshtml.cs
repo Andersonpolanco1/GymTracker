@@ -56,7 +56,9 @@ namespace GymTracker.Pages
             Name = x.Exercise.Name,
             Sets = x.PlannedSets,
             Reps = x.PlannedReps,
-            Minutes = x.PlannedDurationSeconds.HasValue ? x.PlannedDurationSeconds.Value: null
+            Minutes = x.PlannedDurationSeconds.HasValue ? x.PlannedDurationSeconds.Value: null,
+            ImagePath = x.Exercise.ImagePath,
+            Notes = x.Exercise.Notes,
           })
           .OrderBy(x => x.Muscle)
           .ToList();
@@ -67,7 +69,9 @@ namespace GymTracker.Pages
           .Select(x => new CardioItem
           {
             Name = x.Exercise.Name,
-            Minutes = 20 // valor por defecto o configurable
+            Minutes = 20, // valor por defecto o configurable,
+            ImagePath = x.Exercise.ImagePath,
+            Notes = x.Exercise.Notes,
           })
           .ToList();
 
@@ -81,6 +85,9 @@ namespace GymTracker.Pages
       public int Sets { get; set; }
       public int? Reps { get; set; }
       public int? Minutes { get; set; }
+      public string? ImagePath { get; set; }
+      public string? Notes { get; set; }
+
 
     }
 
@@ -88,6 +95,8 @@ namespace GymTracker.Pages
     {
       public string Name { get; set; } = string.Empty;
       public int Minutes { get; set; }
+      public string? ImagePath { get; set; }
+      public string? Notes { get; set; }
     }
 
   }

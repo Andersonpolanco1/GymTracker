@@ -1,0 +1,65 @@
+﻿@model (string? ImageUrl, string? Notes)
+
+<div class="card shadow-sm border-0 bg-light">
+    <div class="card-body p-0">
+        <div class="d-flex flex-column align-items-center justify-content-center"
+             style="min-height: 250px; background-color: #f8f9fa; border-radius: 8px 8px 0 0; overflow: hidden;">
+
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <img src="@Model.ImageUrl"
+                     alt="Demostración del ejercicio"
+                     class="img-fluid"
+                     style="max-height: 400px; width: 100%; object-fit: contain;"
+                     onerror="this.style.display='none'; document.getElementById('error-img').classList.remove('d-none');" />
+
+                <div id="error-img" class="d-none text-center p-4">
+                    <i class="bi bi-exclamation-triangle fs-1 text-warning"></i>
+                    <p class="text-muted">No se pudo cargar la animación.</p>
+                </div>
+            }
+            else
+            {
+                <div class="text-center p-4">
+                    <i class="bi bi-image text-secondary opacity-25" style="font-size: 4rem;"></i>
+                    <p class="text-muted">Sin animación disponible</p>
+                </div>
+            }
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.Notes))
+        {
+            <div class="p-3 bg-white border-top">
+                <h6 class="fw-bold text-uppercase mb-2" style="font-size: 0.8rem; color: #6c757d;">Notas de ejecución:</h6>
+                <p class="mb-0 text-dark" style="white-space: pre-line;">@Model.Notes</p>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+        <script>
+            const urlInput = document.getElementById('urlInput');
+            const notesInput = document.getElementById('notesInput');
+            const previewContainer = document.getElementById('previewContainer');
+
+            function updatePreview() {
+                const url = urlInput.value;
+                const notes = notesInput.value;
+
+                const img = previewContainer.querySelector('img');
+                const notesText = previewContainer.querySelector('p.text-dark');
+
+                if (img && url) {
+                    img.src = url;
+                    img.style.display = 'block';
+                }
+                if (notesText) {
+                    notesText.innerText = notes;
+                }
+            }
+
+            urlInput.addEventListener('input', updatePreview);
+            notesInput.addEventListener('input', updatePreview);
+        </script>
+}

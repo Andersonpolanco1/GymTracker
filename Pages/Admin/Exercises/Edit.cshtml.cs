@@ -4,10 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace GymTracker.Pages.Maintenance.Exercises;
 
-public class EditModel(GymTrackerDbContext context) : PageModel
+public class EditModel(GymTrackerDbContext context, IWebHostEnvironment environment) : PageModel
 {
   private readonly GymTrackerDbContext _context = context;
 
@@ -62,6 +63,15 @@ public class EditModel(GymTrackerDbContext context) : PageModel
       Exercise.MuscleId = null;
     }
 
+    if (Exercise.ImageFile != null)
+    {
+      // Opcional: Borrar la imagen anterior si existe para ahorrar espacio
+      DeleteOldImage(Exercise.ImagePath);
+
+      // Subir la nueva
+      Exercise.ImagePath = await ProcessUploadedFile(Exercise.ImageFile, Exercise.Id);
+    }
+
     _context.Attach(Exercise).State = EntityState.Modified;
     await _context.SaveChangesAsync();
 
@@ -90,6 +100,39 @@ public class EditModel(GymTrackerDbContext context) : PageModel
     return RedirectToPage("Index");
   }
 
+  private async Task<string> ProcessUploadedFile(IFormFile file, int exerciseId)
+  {
+    // Carpeta destino
+    string uploadsFolder = Path.Combine(environment.WebRootPath, "uploads", "exercises");
+
+    if (!Directory.Exists(uploadsFolder))
+      Directory.CreateDirectory(uploadsFolder);
+
+    string safeFileName = Path.GetFileName(file.FileName).Replace(" ", "_");
+
+    // Formato: {ID}_{NombreOriginal} -> Ejemplo: 5_sentadilla.gif
+    string uniqueFileName = $"{exerciseId}_{safeFileName}";
+    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+    using (var fileStream = new FileStream(filePath, FileMode.Create))
+    {
+      await file.CopyToAsync(fileStream);
+    }
+
+    return $"/uploads/exercises/{uniqueFileName}";
+  }
+
+  private void DeleteOldImage(string? relativePath)
+  {
+    if (string.IsNullOrEmpty(relativePath)) return;
+
+    string fullPath = Path.Combine(environment.WebRootPath, relativePath.TrimStart('/'));
+
+    if (System.IO.File.Exists(fullPath))
+    {
+      System.IO.File.Delete(fullPath);
+    }
+  }
 
   private void LoadSelectLists()
   {
