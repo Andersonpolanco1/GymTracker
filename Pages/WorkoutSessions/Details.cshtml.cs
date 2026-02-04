@@ -1,18 +1,22 @@
 using GymTracker.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
 namespace GymTracker.Pages.WorkoutSessions;
 
-public class DetailsModel(GymTrackerDbContext ctx) : PageModel
+public class DetailsModel(GymTrackerDbContext ctx, UserManager<ApplicationUser> userManager) : PageModel
 {
   public WorkoutSession? Session { get; set; } = null!;
   public List<PerformedExerciseAccordionItem> AccordionItems { get; set; } = [];
 
   public async Task<IActionResult> OnGetAsync(int id)
   {
+    var userId = userManager.GetUserId(User)!;
+
     Session = await ctx.WorkoutSessions
+      .Where(x => x.UserId == userId)
       .Include(s => s.PerformedExercises)
         .ThenInclude(p => p.Exercise)
       .FirstOrDefaultAsync(s => s.Id == id);

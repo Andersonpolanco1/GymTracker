@@ -1,10 +1,12 @@
 using GymTracker.Enums;
+using GymTracker.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
 namespace GymTracker.Pages
 {
-  public class IndexModel(GymTrackerDbContext context) : PageModel
+  public class IndexModel(GymTrackerDbContext context, UserManager<ApplicationUser> userManager) : PageModel
   {
 
     public DateTime Today { get; set; }
@@ -18,6 +20,9 @@ namespace GymTracker.Pages
 
     public async Task OnGetAsync()
     {
+
+      var userId = userManager.GetUserId(User)!;
+
       // Fecha actual
       Today = Utils.Utilities.NowRD();
 
@@ -26,7 +31,7 @@ namespace GymTracker.Pages
 
       // Buscar el WorkoutDay según el día actual
       var workoutDay = await context.WorkoutDays
-        .Where(d => d.IsActive)
+        .Where(d => d.IsActive && d.UserId == userId)
           .Include(w => w.Exercises)
               .ThenInclude(e => e.Exercise)
                   .ThenInclude(ex => ex.Muscle)

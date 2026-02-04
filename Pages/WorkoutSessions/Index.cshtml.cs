@@ -1,16 +1,15 @@
 using GymTracker.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration.UserSecrets;
 
 namespace GymTracker.Pages.WorkoutSessions
 {
-  public class IndexModel : PageModel
+  public class IndexModel(GymTrackerDbContext context, UserManager<ApplicationUser> userManager) : PageModel
   {
-    private readonly GymTrackerDbContext ctx;
-    public IndexModel(GymTrackerDbContext context) => ctx = context;
-
     public List<WorkoutSessionRow> Sessions { get; set; } = new();
 
     // Filtros
@@ -24,6 +23,7 @@ namespace GymTracker.Pages.WorkoutSessions
     public List<int> Years { get; set; } = new();
     public List<SelectListItem> Months { get; set; } = new();
 
+
     // Diccionario de nombres de meses en español
     private readonly Dictionary<int, string> MonthNames = new()
         {
@@ -34,15 +34,19 @@ namespace GymTracker.Pages.WorkoutSessions
 
     public async Task OnGetAsync()
     {
+      var userId = userManager.GetUserId(User)!;
+
       // Obtener años con sesiones
-      Years = await ctx.WorkoutSessions
+      Years = await context.WorkoutSessions
+           .Where(x => x.UserId == userId)
           .Select(s => s.Date.Year)
           .Distinct()
           .OrderByDescending(y => y)
           .ToListAsync();
 
       // Query base
-      var query = ctx.WorkoutSessions
+      var query = context.WorkoutSessions
+          .Where(x => x.UserId == userId)
           .Include(s => s.WorkoutDay)
           .Include(s => s.PerformedExercises)
           .AsQueryable();

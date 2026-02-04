@@ -1,20 +1,14 @@
 using GymTracker.Enums;
 using GymTracker.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
 namespace GymTracker.Pages.Maintenance.Routine
 {
-  public class EditModel : PageModel
+  public class EditModel(GymTrackerDbContext context, UserManager<ApplicationUser> userManager) : PageModel
   {
-    private readonly GymTrackerDbContext _context;
-
-    public EditModel(GymTrackerDbContext context)
-    {
-      _context = context;
-    }
-
     [BindProperty]
     public WorkoutDay? Day { get; set; } = null!;
 
@@ -36,7 +30,10 @@ namespace GymTracker.Pages.Maintenance.Routine
     // ===========================
     public async Task<IActionResult> OnGetAsync(int id)
     {
-      Day = await _context.WorkoutDays
+      var userId = userManager.GetUserId(User)!;
+
+      Day = await context.WorkoutDays
+        .Where(wd => wd.UserId == userId)
           .Include(d => d.Exercises)
               .ThenInclude(e => e.Exercise)
           .FirstOrDefaultAsync(d => d.Id == id);
@@ -52,7 +49,7 @@ namespace GymTracker.Pages.Maintenance.Routine
           .Where(e => e.Exercise.Type == ExerciseType.Cardio)
           .ToList();
 
-      AllExercises = await _context.Exercises
+      AllExercises = await context.Exercises
           .OrderBy(e => e.Name)
           .ToListAsync();
 
@@ -64,11 +61,11 @@ namespace GymTracker.Pages.Maintenance.Routine
     // ===========================
     public async Task<IActionResult> OnPostAddExerciseAsync(int id)
     {
-      var exercise = await _context.Exercises.FindAsync(ExerciseId);
+      var exercise = await context.Exercises.FindAsync(ExerciseId);
       if (exercise == null)
         return RedirectToPage(new { id });
 
-      var exists = await _context.Set<WorkoutDayExercise>()
+      var exists = await context.Set<WorkoutDayExercise>()
           .AnyAsync(x => x.WorkoutDayId == id && x.ExerciseId == ExerciseId);
 
       if (!exists)
@@ -91,8 +88,8 @@ namespace GymTracker.Pages.Maintenance.Routine
           entry.PlannedSets = 1;
         }
 
-        _context.Add(entry);
-        await _context.SaveChangesAsync();
+        context.Add(entry);
+        await context.SaveChangesAsync();
       }
 
       return RedirectToPage(new { id });
@@ -103,13 +100,13 @@ namespace GymTracker.Pages.Maintenance.Routine
     // ===========================
     public async Task<IActionResult> OnPostRemoveExerciseAsync(int id, int exId)
     {
-      var item = await _context.Set<WorkoutDayExercise>()
+      var item = await context.Set<WorkoutDayExercise>()
           .FirstOrDefaultAsync(e => e.Id == exId && e.WorkoutDayId == id);
 
       if (item != null)
       {
-        _context.Remove(item);
-        await _context.SaveChangesAsync();
+        context.Remove(item);
+        await context.SaveChangesAsync();
       }
 
       return RedirectToPage(new { id });
