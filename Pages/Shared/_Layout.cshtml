@@ -2,13 +2,33 @@
 <html lang="es">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- PWA: viewport correcto para iOS fullscreen -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
     <title>@ViewData["Title"] - GymTracker</title>
+
+        <!-- CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/GymTracker.styles.css" asp-append-version="true" />
-    <link rel="icon" type="image/x-icon" href="~/img/favico.ico" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+    <!-- ================= PWA ================= -->
+    <link rel="manifest" href="/Icons/site.manifest">
+
+    <!-- Favicon -->
+    <link rel="icon" href="/Icons/favicon.ico">
+    <link rel="icon" type="image/png" sizes="96x96" href="/Icons/favicon-96x96.png">
+
+    <!-- iOS -->
+    <link rel="apple-touch-icon" href="/Icons/apple-touch-icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GymTracker">
+
+    <!-- Color de la barra -->
+    <meta name="theme-color" content="#0f172a">
 
 </head>
 <body>
@@ -36,32 +56,24 @@
                     <ul class="navbar-nav flex-grow-1">
                         @if (User.Identity!.IsAuthenticated)
                         {
-                            <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item">
+                                <a class="nav-link" asp-page="/Index">Inicio</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-page="/WorkoutSessions/Index">Historial de entrenamiento</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-page="/Profile/Settings/Index">Mi perfil</a>
+                            </li>
+
+                            @if (User.IsInRole("Admin"))
+                            {
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-page="/Index">Inicio</a>
+                                    <a class="nav-link text-danger" asp-page="/Admin/Index">Administración</a>
                                 </li>
-
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-page="/WorkoutSessions/Index">Historial de entrenamiento</a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-page="/Profile/Settings/Index">
-                                        Mi perfil
-                                    </a>
-                                </li>
-
-
-                                @if (User.IsInRole("Admin"))
-                                {
-                                    <li class="nav-item">
-                                        <a class="nav-link text-danger" asp-page="/Admin/Index">
-                                            Administración
-                                        </a>
-                                    </li>
-                                }
-                            </ul>
-
+                            }
                         }
                     </ul>
 
@@ -91,7 +103,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2026 - Gymc Tracker
+            &copy; 2026 - GymTracker
         </div>
     </footer>
 

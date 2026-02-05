@@ -20,3 +20,27 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+header.navbar {
+  padding-top: env(safe-area-inset-top);
+}
+
+footer {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@supports(padding: env(safe-area-inset-top)) {
+  header nav.navbar {
+    padding-top: env(safe-area-inset-top);
+    position: relative;
+    z-index: 1000;
+  }
+
+  footer {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  main {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
